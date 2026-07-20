@@ -446,8 +446,8 @@
     <section class="panel" id="settimana" aria-labelledby="week-title" hidden>
       <div class="shell">
         <header class="panel-head">
-          <h1 id="week-title">Pranzi e cene della settimana</h1>
-          <p>Colazione e spuntino restano quelli mostrati in “Oggi”. Qui vedi solo le decisioni che cambiano davvero.</p>
+          <h1 id="week-title">Piano personalizzato per definizione</h1>
+          <p>Uomo, 31 anni, 164 cm, 70 kg, lavoro sedentario e 3 allenamenti con i pesi. Obiettivo: perdere grasso mantenendo o ricostruendo muscolo.</p>
         </header>
 
         <div class="summary-grid">
@@ -456,7 +456,7 @@
           <div class="summary-box"><strong id="week-protein-target">1,6–2,0 g/kg</strong><span>target proteine</span></div>
         </div>
 
-        <div class="target-note" id="protein-target-note"><strong>Ricomposizione:</strong> registra il peso nel Check per calcolare il tuo target. Il deficit moderato, la forza e il girovita contano più di tagli estremi.</div>
+        <div class="target-note" id="protein-target-note"><strong>Profilo:</strong> calcolo in corso. Qui trovi il deficit di partenza e il target proteico; il Check-in li corregge solo dopo un trend di 2–3 settimane.</div>
 
         <aside class="flex-card">
           <h2>🍕 Uscite senza rovinare il cut</h2>
@@ -588,12 +588,21 @@
           </div>
         </details>
 
-        <div class="reality-note"><strong>La regola scientifica:</strong> non puoi scegliere di perdere solo il grasso della pancia. Un deficit moderato, 3 allenamenti con i pesi, proteine distribuite nei 4 pasti e sonno aiutano a perdere grasso preservando la massa; aumentarla durante il deficit è più probabile se sei principiante o ritorni ad allenarti. Riferimenti: <a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-017-0177-8" target="_blank" rel="noreferrer">ISSN</a>, <a href="https://www.who.int/publications/i/item/9789240073593" target="_blank" rel="noreferrer">WHO</a> e <a href="https://www.efsa.europa.eu/en/safe2eat/proper-food-handling" target="_blank" rel="noreferrer">EFSA</a>.</div>
+        <div class="reality-note"><strong>La fase scelta:</strong> questa è definizione con ricomposizione, non una fase massa. Non puoi scegliere di perdere solo il grasso della pancia: un deficit moderato, 3 allenamenti con i pesi, proteine distribuite nei 4 pasti e sonno aiutano a perdere grasso preservando la massa. Aumentarla durante il deficit è più probabile se sei principiante o ritorni ad allenarti. Riferimenti: <a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-017-0177-8" target="_blank" rel="noreferrer">ISSN</a>, <a href="https://www.who.int/publications/i/item/9789240073593" target="_blank" rel="noreferrer">WHO</a> e <a href="https://www.efsa.europa.eu/en/safe2eat/proper-food-handling" target="_blank" rel="noreferrer">EFSA</a>.</div>
       </div>
     </section>
   </main>
 
   <script>
+    const userProfile = { sex: "male", age: 31, heightCm: 164, weightKg: 70, trainingDays: 3, deskWork: true };
+    const energyEstimate = profile => {
+      const bmr = Math.round(10 * profile.weightKg + 6.25 * profile.heightCm - 5 * profile.age + (profile.sex === "male" ? 5 : -161));
+      const maintenanceLow = Math.round(bmr * 1.35);
+      const maintenanceHigh = Math.round(bmr * 1.45);
+      const targetKcal = Math.round(((maintenanceLow + maintenanceHigh) / 2 - 350) / 50) * 50;
+      return { bmr, maintenanceLow, maintenanceHigh, targetKcal };
+    };
+
     const meals = {
       breakfast: {
         emoji: "🥣", name: "Yogurt bowl croccante", time: "2 min", kcal: 400, protein: 36,
@@ -951,11 +960,11 @@
     function renderWeek() {
       const today = todayIndex();
       const measurements = normalizeMeasurements(store.get("cut-measurements", [])).sort((a, b) => b.date.localeCompare(a.date));
-      const target = proteinTarget(measurements[0]?.weight);
+      const weight = Number(measurements[0]?.weight) || userProfile.weightKg;
+      const target = proteinTarget(weight);
+      const energy = energyEstimate({ ...userProfile, weightKg: weight });
       document.querySelector("#week-protein-target").textContent = target ? `${target.low}–${target.high} g` : "1,6–2,0 g/kg";
-      document.querySelector("#protein-target-note").innerHTML = target
-        ? `<strong>Ricomposizione:</strong> con ${Number(measurements[0].weight).toFixed(1).replace(".", ",")} kg, un intervallo pratico è ${target.low}–${target.high} g di proteine al giorno. Il menu ne offre circa 156 g: se sei molto più leggero o hai una patologia renale, non inseguire il numero senza un professionista.`
-        : "<strong>Ricomposizione:</strong> registra il peso nel Check per calcolare il target. In assenza di dati, usa 1,6–2,0 g/kg/die come intervallo pratico per chi si allena; il deficit moderato e la forza contano più di tagli estremi.";
+      document.querySelector("#protein-target-note").innerHTML = `<strong>Definizione:</strong> per ${weight.toFixed(1).replace(".", ",")} kg, BMR stimato ${energy.bmr.toLocaleString("it-IT")} kcal e mantenimento prudente ${energy.maintenanceLow.toLocaleString("it-IT")}–${energy.maintenanceHigh.toLocaleString("it-IT")} kcal. Partenza: circa ${energy.targetKcal.toLocaleString("it-IT")} kcal e ${target.low}–${target.high} g di proteine. Il menu attuale è circa 1.790 kcal e 156 g: non aggiungere proteine; se il trend scende troppo o la forza cala, si corregge nel Check, non da un singolo peso.`;
       document.querySelector("#week-list").innerHTML = schedule.map((day, index) => {
         const total = totals(day, index);
         const dinner = dayMeals(day, index)[3];
