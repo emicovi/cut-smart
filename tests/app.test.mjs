@@ -73,6 +73,8 @@ assert.match(mealCard("breakfast", 0, 0), />Mangiato<\/button>/);
 assert.match(mealCard("breakfast", 0, 1), /disabled[^>]*>In programma<\/button>/, "Future meal button must be disabled");
 assert.match(html, /meta name="description"/, "The app needs a concise page description");
 assert.match(html, /id="today-next"/, "Today view should surface the next meal");
+assert.match(html, /id="week-average-kcal">—<\/strong>/, "Nutrition summaries must start neutral before food data loads");
+assert.match(html, /foodDatabase = \(await response\.json\(\)\)\.foods;[\s\S]*refreshNutrition\(\);/, "Nutrition must render after the food database resolves");
 assert.match(html, /id="shopping-badge"/, "Shopping progress should be visible in navigation");
 assert.match(html, /id="shopping-search"/, "Shopping list should be searchable");
 assert.match(html, /data-group-count>0\/\$\{group\.items\.length\}/, "Category counters should start at zero items taken");

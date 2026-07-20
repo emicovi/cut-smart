@@ -416,7 +416,7 @@
 
         <header class="today-summary" aria-live="polite">
           <div><small id="today-context">Oggi mangi</small><h1 id="today-title">Lunedì</h1></div>
-          <div class="today-total"><strong id="today-kcal">1.685 kcal</strong><span id="today-protein">147 g proteine</span></div>
+          <div class="today-total"><strong id="today-kcal">— kcal</strong><span id="today-protein">— g proteine</span></div>
           <div class="daily-progress"><div class="daily-progress-copy"><strong id="daily-progress-label">0/4 pasti completati</strong><span id="today-next">Prossimo: colazione · 2 min</span><button class="next-action" id="today-next-action" type="button" hidden>Apri preparazione</button></div><div class="daily-progress-track" aria-hidden="true"><div class="daily-progress-bar" id="daily-progress-bar"></div></div></div>
         </header>
 
@@ -451,9 +451,9 @@
         </header>
 
         <div class="summary-grid">
-          <div class="summary-box"><strong id="week-average-kcal">≈ 1.850</strong><span>kcal medie</span></div>
-          <div class="summary-box"><strong id="week-average-protein">≈ 156 g</strong><span>proteine medie</span></div>
-          <div class="summary-box"><strong id="week-protein-target">1,6–2,0 g/kg</strong><span>target proteine</span></div>
+          <div class="summary-box"><strong id="week-average-kcal">—</strong><span>kcal medie</span></div>
+          <div class="summary-box"><strong id="week-average-protein">—</strong><span>proteine medie</span></div>
+          <div class="summary-box"><strong id="week-protein-target">—</strong><span>target proteine</span></div>
         </div>
 
         <div class="target-note" id="protein-target-note"><strong>Profilo:</strong> calcolo in corso. Qui trovi il deficit di partenza e il target proteico; il Check-in li corregge solo dopo un trend di 2–3 settimane.</div>
@@ -1313,8 +1313,6 @@
     async function init() {
       sanitizeTrackingData();
       renderDayPicker();
-      renderSelectedDay();
-      renderWeek();
       renderPrepChecklist();
       renderShopping();
       renderLog();
@@ -1327,10 +1325,10 @@
         const response = await fetch("data/foods.json");
         if (!response.ok) throw new Error(`Food database: ${response.status}`);
         foodDatabase = (await response.json()).foods;
-        refreshNutrition();
       } catch (error) {
         console.warn("Uso i valori nutrizionali integrati", error);
       }
+      refreshNutrition();
       fillFoodLabelForm();
       selfCheck();
     }
