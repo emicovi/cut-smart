@@ -2,26 +2,27 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Piano pratico di definizione per uomo di 31 anni, 164 cm e 70 kg: menu, spesa e check-in.">
-  <title>Cut Smart | Piano 70 kg</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#176b43">
+  <title>Cut Smart</title>
   <style>
     :root {
-      --ink: #16201d;
-      --muted: #5e6b66;
-      --line: #d8dfdc;
-      --surface: #ffffff;
-      --canvas: #f4f6f5;
-      --green: #0f6b4f;
-      --green-soft: #dff1e9;
-      --blue: #245d8d;
-      --blue-soft: #e5eff8;
-      --amber: #9a5b08;
-      --amber-soft: #fff0cf;
-      --red: #9d3b35;
-      --red-soft: #fae5e3;
-      --shadow: 0 12px 30px rgba(20, 34, 29, .08);
-      --radius: 8px;
+      color-scheme: light;
+      --ink: #102219;
+      --muted: #66736b;
+      --line: #dce4de;
+      --canvas: #f5f7f3;
+      --surface: #fff;
+      --green: #176b43;
+      --green-dark: #0e5030;
+      --green-soft: #e3f2e8;
+      --orange: #d85a29;
+      --orange-soft: #fff0e8;
+      --yellow-soft: #fff6d6;
+      --red: #9b3933;
+      --red-soft: #fbe8e6;
+      --shadow: 0 8px 24px rgba(16, 34, 25, .07);
+      --radius: 17px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
       background: var(--canvas);
@@ -30,531 +31,740 @@
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body { margin: 0; min-width: 320px; background: var(--canvas); }
-    button, input, select { font: inherit; letter-spacing: 0; }
+    body, button, input, select { font: inherit; }
+    button, input, select { color: inherit; }
     button { cursor: pointer; }
-    a { color: var(--blue); text-underline-offset: 3px; }
-    img { display: block; max-width: 100%; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 3px solid rgba(23, 107, 67, .25); outline-offset: 2px; }
 
-    .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
-    .topbar {
+    .shell { width: min(100% - 26px, 1060px); margin-inline: auto; }
+
+    .app-header {
       position: sticky;
       top: 0;
-      z-index: 20;
-      background: rgba(255, 255, 255, .96);
+      z-index: 30;
       border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, .98);
     }
-    .topbar-inner { min-height: 64px; display: flex; align-items: center; gap: 22px; }
-    .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; flex: 0 0 auto; }
-    .brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: white; background: var(--green); font-weight: 800; }
-    .brand strong { font-size: .95rem; }
-    .tabs { display: flex; align-items: stretch; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; flex: 1; }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab {
-      min-height: 63px;
-      padding: 0 14px;
-      border: 0;
-      border-bottom: 3px solid transparent;
-      color: var(--muted);
-      background: transparent;
-      white-space: nowrap;
-      font-size: .9rem;
-      font-weight: 700;
+    .header-row { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--ink); text-decoration: none; }
+    .brand-mark { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 11px; color: #fff; background: var(--green); font-size: .76rem; font-weight: 950; }
+    .brand strong { display: block; font-size: .95rem; }
+    .brand small { display: block; margin-top: 1px; color: var(--muted); font-size: .66rem; }
+    .goal-chip { padding: 7px 9px; border-radius: 10px; color: var(--green-dark); background: var(--green-soft); font-size: .7rem; font-weight: 900; }
+
+    .app-nav {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 40;
+      min-height: 68px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: rgba(255, 255, 255, .98);
+      box-shadow: 0 -8px 24px rgba(16, 34, 25, .08);
     }
-    .tab:hover { color: var(--ink); background: #f7f9f8; }
-    .tab[aria-selected="true"] { color: var(--green); border-color: var(--green); }
-    .icon-button {
+    .nav-button {
+      min-width: 0;
+      min-height: 54px;
       display: grid;
       place-items: center;
-      width: 40px;
-      height: 40px;
-      flex: 0 0 40px;
+      align-content: center;
+      gap: 3px;
+      padding: 4px;
+      border: 0;
+      border-radius: 13px;
+      color: #5f6c64;
+      background: transparent;
+      font-size: .67rem;
+      font-weight: 850;
+    }
+    .nav-button svg { width: 21px; height: 21px; stroke-width: 2; }
+    .nav-button[aria-current="page"] { color: var(--green); background: var(--green-soft); }
+
+    main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+    .panel { padding: 15px 0 34px; }
+    .panel-head { margin: 4px 0 15px; }
+    .panel-head h1 { margin: 0; font-size: clamp(1.65rem, 7vw, 2.35rem); line-height: 1.05; letter-spacing: -.035em; }
+    .panel-head p { max-width: 620px; margin: 7px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.5; }
+
+    .day-picker { display: flex; gap: 7px; margin: 0 -13px 10px; padding: 0 13px 4px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
+    .day-picker::-webkit-scrollbar { display: none; }
+    .day-button {
+      flex: 0 0 56px;
+      min-height: 56px;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 2px;
+      padding: 6px 4px;
       border: 1px solid var(--line);
-      border-radius: 6px;
-      color: var(--ink);
-      background: white;
+      border-radius: 15px;
+      color: var(--muted);
+      background: var(--surface);
+      scroll-snap-align: center;
     }
-    .icon-button:hover { border-color: var(--green); color: var(--green); }
-    .icon-button svg { width: 19px; height: 19px; }
+    .day-button span { font-size: .67rem; font-weight: 900; text-transform: uppercase; }
+    .day-button strong { font-size: .9rem; }
+    .day-button[aria-pressed="true"] { border-color: var(--green); color: #fff; background: var(--green); box-shadow: 0 6px 16px rgba(23, 107, 67, .2); }
+    .day-button.is-today:not([aria-pressed="true"]) { border-color: #afd1bb; color: var(--green); background: var(--green-soft); }
 
-    .hero {
-      position: relative;
-      min-height: 300px;
-      display: flex;
-      align-items: end;
-      overflow: hidden;
-      color: white;
-      background: #263a33 url("assets/meal-prep-hero.jpg") center 45% / cover no-repeat;
+    .today-summary {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 15px;
+      border: 1px solid #c8dfcf;
+      border-radius: 19px;
+      background: var(--green-soft);
     }
-    .hero::before { content: ""; position: absolute; inset: 0; background: rgba(8, 18, 15, .61); }
-    .hero .shell { position: relative; padding: 52px 0 38px; }
-    .eyebrow { margin: 0 0 8px; font-size: .82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }
-    .hero h1 { max-width: 780px; margin: 0; font-size: 3.35rem; line-height: 1.03; letter-spacing: 0; }
-    .hero p { max-width: 680px; margin: 14px 0 0; color: #eef5f2; font-size: 1.05rem; line-height: 1.55; }
-    .hero-metrics { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-top: 24px; }
-    .hero-metric { display: flex; align-items: baseline; gap: 7px; }
-    .hero-metric strong { font-size: 1.35rem; }
-    .hero-metric span { color: #d9e6e1; font-size: .84rem; }
+    .today-summary small { color: var(--green-dark); font-size: .72rem; font-weight: 850; }
+    .today-summary h1 { margin: 3px 0 0; font-size: 1.45rem; letter-spacing: -.03em; }
+    .today-total { text-align: right; }
+    .today-total strong { display: block; font-size: 1.05rem; }
+    .today-total span { display: block; margin-top: 2px; color: var(--green-dark); font-size: .72rem; font-weight: 850; }
 
-    main { min-height: 65vh; }
-    .panel[hidden] { display: none; }
-    .band { padding: 48px 0; border-bottom: 1px solid var(--line); }
-    .band.white { background: var(--surface); }
-    .band:last-child { border-bottom: 0; }
-    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
-    .section-head h2 { margin: 0; font-size: 1.65rem; letter-spacing: 0; }
-    .section-head p { max-width: 640px; margin: 7px 0 0; color: var(--muted); line-height: 1.55; }
-    .status { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 9px; border-radius: 999px; font-size: .78rem; font-weight: 800; }
-    .status.good { color: var(--green); background: var(--green-soft); }
-    .status.watch { color: var(--amber); background: var(--amber-soft); }
+    .meal-list { display: grid; gap: 10px; margin-top: 11px; }
+    .meal-card { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: 0 4px 15px rgba(16, 34, 25, .035); }
+    .meal-main { padding: 15px; }
+    .meal-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .meal-slot { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .meal-emoji {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      border-radius: 13px;
+      background: var(--orange-soft);
+      font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+      font-size: 1.8rem;
+      line-height: 1;
+    }
+    .meal-slot > div span { display: block; color: var(--muted); font-size: .67rem; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
+    .meal-slot > div strong { display: block; margin-top: 2px; font-size: .76rem; }
+    .time { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; color: var(--green-dark); background: var(--green-soft); font-size: .7rem; font-weight: 900; }
+    .meal-card h2 { margin: 12px 0 9px; font-size: 1.12rem; letter-spacing: -.025em; }
+    .ingredients { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
+    .ingredients li { padding: 6px 8px; border-radius: 9px; color: #445149; background: #f2f5f2; font-size: .77rem; }
+    .ingredients b { color: var(--ink); }
+    .taste { margin: 10px 0 0; color: #80502f; font-size: .75rem; line-height: 1.4; }
+    .recipe { border-top: 1px solid #edf0ed; background: #fffaf7; }
+    .recipe summary { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 15px; color: var(--orange); cursor: pointer; list-style: none; font-size: .79rem; font-weight: 900; }
+    .recipe summary::-webkit-details-marker { display: none; }
+    .recipe summary::after { content: "+"; font-size: 1.15rem; }
+    .recipe[open] summary::after { content: "−"; }
+    .recipe p { margin: 0; padding: 0 15px 14px; color: #59463b; font-size: .82rem; line-height: 1.5; }
 
-    .verdict { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); gap: 42px; align-items: start; }
-    .verdict h2 { margin: 10px 0 14px; max-width: 650px; font-size: 2rem; line-height: 1.16; letter-spacing: 0; }
-    .verdict p { margin: 0; color: #42504b; line-height: 1.68; }
-    .callout { padding: 18px 20px; border-left: 4px solid var(--amber); background: var(--amber-soft); }
-    .callout strong { display: block; margin-bottom: 6px; }
-    .callout p { font-size: .92rem; }
+    .prep-alert { margin-top: 11px; padding: 13px; border: 1px solid #ead888; border-radius: 15px; background: var(--yellow-soft); }
+    .prep-alert strong { display: block; font-size: .82rem; }
+    .prep-alert p { margin: 4px 0 0; color: #63582f; font-size: .77rem; line-height: 1.45; }
 
-    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .metric { min-height: 132px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: white; box-shadow: var(--shadow); }
-    .metric span { color: var(--muted); font-size: .8rem; font-weight: 700; }
-    .metric strong { display: block; margin: 10px 0 5px; font-size: 1.55rem; letter-spacing: 0; }
-    .metric small { color: var(--muted); line-height: 1.35; }
+    .rule-bar { margin-top: 11px; padding: 11px 13px; border-radius: 14px; color: #425047; background: #e9eeea; font-size: .75rem; line-height: 1.45; }
+    .rule-bar strong { color: var(--ink); }
 
-    .meal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    .meal-card { min-height: 210px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
-    .meal-card .meal-type { color: var(--green); font-size: .75rem; font-weight: 800; text-transform: uppercase; }
-    .meal-card h3 { min-height: 48px; margin: 8px 0 12px; font-size: 1.08rem; line-height: 1.35; letter-spacing: 0; }
-    .meal-card ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .88rem; line-height: 1.55; }
-    .meal-card footer { display: flex; gap: 8px; margin-top: 16px; }
-    .chip { display: inline-flex; align-items: center; min-height: 26px; padding: 3px 8px; border-radius: 999px; color: var(--blue); background: var(--blue-soft); font-size: .75rem; font-weight: 800; }
-
-    .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-    .rule { display: grid; grid-template-columns: 36px 1fr; gap: 13px; }
-    .rule svg { width: 25px; color: var(--green); }
-    .rule h3 { margin: 0 0 5px; font-size: 1rem; letter-spacing: 0; }
-    .rule p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
-
-    .week-list { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
-    .day-row { display: grid; grid-template-columns: 100px minmax(180px, 1fr) minmax(180px, 1fr) 170px; gap: 16px; align-items: center; min-height: 82px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
-    .day-row:last-child { border-bottom: 0; }
-    .day-row.today { box-shadow: inset 4px 0 var(--green); background: #f7fbf9; }
-    .day-row strong { font-size: .92rem; }
-    .day-row .dish { color: #394741; font-size: .9rem; line-height: 1.35; }
-    .day-total { display: flex; gap: 7px; justify-content: flex-end; }
-
-    .recipe-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .recipe { padding: 19px; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
-    .recipe h3 { margin: 0 0 9px; font-size: 1rem; letter-spacing: 0; }
-    .recipe p { margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
-    .recipe .chip { margin-top: 14px; }
-
-    .segmented { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; padding: 3px; border: 1px solid var(--line); border-radius: 7px; background: #edf1ef; }
-    .segment { min-height: 36px; padding: 6px 13px; border: 0; border-radius: 5px; color: var(--muted); background: transparent; font-size: .84rem; font-weight: 800; white-space: nowrap; }
-    .segment[aria-pressed="true"] { color: var(--ink); background: white; box-shadow: 0 1px 5px rgba(20, 34, 29, .12); }
-    .shopping-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: start; }
-    .shopping-groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    .shopping-group h3 { margin: 0 0 12px; font-size: .96rem; letter-spacing: 0; }
-    .checklist { display: grid; gap: 8px; }
-    .check-item { position: relative; display: grid; grid-template-columns: 22px 1fr; gap: 9px; align-items: start; min-height: 38px; padding: 8px; border-radius: 6px; }
-    .check-item:hover { background: #f1f5f3; }
-    .check-item input { width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--green); }
-    .check-item span { color: #394741; font-size: .9rem; line-height: 1.4; }
-    .check-item input:checked + span { color: #8a9691; text-decoration: line-through; }
-    .audit { padding: 20px; border: 1px solid #e6c578; border-radius: var(--radius); background: var(--amber-soft); }
-    .audit h3 { margin: 0 0 12px; font-size: 1rem; }
-    .audit ul { margin: 0; padding-left: 18px; color: #5d4829; font-size: .88rem; line-height: 1.55; }
-
-    .prep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    .prep-block { padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
-    .prep-block h3 { margin: 0 0 12px; font-size: 1rem; }
-    .prep-block ul { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.6; }
-
-    .checkin-layout { display: grid; grid-template-columns: minmax(0, .85fr) minmax(340px, 1.15fr); gap: 34px; align-items: start; }
-    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .field { display: grid; gap: 6px; }
-    .field.full { grid-column: 1 / -1; }
-    .field label { color: #3a4742; font-size: .82rem; font-weight: 800; }
-    .field input, .field select { width: 100%; min-height: 44px; padding: 9px 11px; border: 1px solid #bdc8c3; border-radius: 6px; color: var(--ink); background: white; }
-    .field input:focus, .field select:focus { outline: 3px solid rgba(15, 107, 79, .17); border-color: var(--green); }
-    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 9px 15px; border: 1px solid var(--green); border-radius: 6px; color: white; background: var(--green); font-weight: 800; }
-    .button:hover { background: #0b573f; }
-    .button.secondary { color: var(--green); background: white; }
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 11px; }
+    .button {
+      min-height: 43px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      border: 1px solid var(--green);
+      border-radius: 12px;
+      color: #fff;
+      background: var(--green);
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .button:hover { background: var(--green-dark); }
+    .button.secondary { color: var(--green); background: #fff; }
     .button.secondary:hover { background: var(--green-soft); }
-    .button svg { width: 18px; height: 18px; }
-    .recommendation { min-height: 116px; padding: 20px; border-radius: var(--radius); background: var(--blue-soft); }
-    .recommendation[data-tone="good"] { background: var(--green-soft); }
-    .recommendation[data-tone="watch"] { background: var(--amber-soft); }
+    .button.small { min-height: 38px; padding: 7px 10px; font-size: .76rem; }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 13px; }
+    .summary-box { min-width: 0; padding: 11px 6px; border: 1px solid var(--line); border-radius: 13px; text-align: center; background: #fff; }
+    .summary-box strong { display: block; font-size: .92rem; }
+    .summary-box span { display: block; margin-top: 2px; color: var(--muted); font-size: .64rem; }
+
+    .week-list { display: grid; gap: 8px; }
+    .week-day { overflow: hidden; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .week-day[open] { border-color: #b9d7c2; box-shadow: var(--shadow); }
+    .week-day summary { min-height: 68px; display: grid; grid-template-columns: 47px 1fr auto; gap: 9px; align-items: center; padding: 10px 12px; cursor: pointer; list-style: none; }
+    .week-day summary::-webkit-details-marker { display: none; }
+    .week-date { display: grid; place-items: center; align-content: center; width: 45px; height: 45px; border-radius: 13px; color: var(--green); background: var(--green-soft); }
+    .week-date span { font-size: .61rem; font-weight: 900; text-transform: uppercase; }
+    .week-date strong { font-size: .91rem; }
+    .week-copy { min-width: 0; }
+    .week-copy strong { display: block; font-size: .86rem; }
+    .week-copy span { display: block; margin-top: 3px; overflow: hidden; color: var(--muted); font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+    .week-total { text-align: right; font-size: .7rem; font-weight: 900; }
+    .week-total span { display: block; margin-top: 2px; color: var(--muted); font-size: .62rem; font-weight: 700; }
+    .week-detail { padding: 0 12px 12px; border-top: 1px solid #edf0ed; }
+    .week-meal { display: grid; grid-template-columns: 72px 1fr; gap: 7px; padding: 8px 0; border-bottom: 1px solid #edf0ed; font-size: .76rem; }
+    .week-meal span { color: var(--muted); font-weight: 800; }
+    .week-detail .button { width: 100%; margin-top: 10px; }
+
+    .section { margin-top: 22px; }
+    .section-title { margin-bottom: 10px; }
+    .section-title h2 { margin: 0; font-size: 1.12rem; letter-spacing: -.02em; }
+    .section-title p { margin: 4px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+    .prep-grid { display: grid; gap: 9px; }
+    .prep-card { padding: 14px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .prep-card header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .prep-card h3 { margin: 0; font-size: .91rem; }
+    .prep-card header span { padding: 4px 7px; border-radius: 999px; color: #8c4a19; background: var(--yellow-soft); font-size: .66rem; font-weight: 900; }
+    .prep-card ol { margin: 10px 0 0; padding-left: 19px; color: #445149; font-size: .77rem; line-height: 1.45; }
+    .prep-card li + li { margin-top: 6px; }
+
+    .shopping-progress { padding: 15px; border-radius: 18px; color: #fff; background: var(--green); }
+    .progress-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; }
+    .progress-head h2 { margin: 0; font-size: 1.05rem; }
+    .progress-head p { margin: 3px 0 0; color: #d8ecdf; font-size: .75rem; }
+    .progress-count { text-align: right; }
+    .progress-count strong { display: block; font-size: 1.2rem; }
+    .progress-count span { color: #d8ecdf; font-size: .62rem; }
+    .progress-track { height: 7px; overflow: hidden; margin-top: 12px; border-radius: 999px; background: rgba(255, 255, 255, .2); }
+    .progress-bar { width: 0; height: 100%; border-radius: inherit; background: #f2c85b; transition: width .2s ease; }
+    .shopping-tools { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin: 10px 0; }
+    .remaining { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; color: var(--muted); font-size: .76rem; font-weight: 800; }
+    .remaining input { width: 18px; height: 18px; accent-color: var(--green); }
+    .reset { min-height: 38px; padding: 7px 10px; border: 1px solid #e3c5c2; border-radius: 10px; color: var(--red); background: #fff; font-size: .73rem; font-weight: 850; }
+
+    .shopping-groups { display: grid; gap: 10px; }
+    .shopping-group { overflow: hidden; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .shopping-group h2 { display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px 13px 9px; font-size: .88rem; }
+    .shopping-group h2 span { font-size: 1.08rem; }
+    .checklist { display: grid; }
+    .check-item { display: grid; grid-template-columns: 23px 1fr; gap: 9px; align-items: center; min-height: 55px; padding: 8px 13px; border-top: 1px solid #edf0ed; }
+    .check-item input { width: 19px; height: 19px; margin: 0; accent-color: var(--green); }
+    .item-copy { min-width: 0; display: grid; grid-template-columns: minmax(75px, auto) 1fr; gap: 8px; align-items: baseline; }
+    .item-copy strong { font-size: .78rem; }
+    .item-copy span { color: #3e4b44; font-size: .78rem; }
+    .item-copy small { display: block; margin-top: 2px; color: var(--muted); font-size: .66rem; }
+    .check-item:has(input:checked) { background: #f4f6f4; }
+    .check-item input:checked + .item-copy { opacity: .48; text-decoration: line-through; }
+    .check-item.filtered, .shopping-group.empty { display: none; }
+    .shopping-note { margin-top: 10px; padding: 12px; border-radius: 13px; color: #63522d; background: var(--yellow-soft); font-size: .74rem; line-height: 1.45; }
+
+    .check-targets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 11px; }
+    .check-target { padding: 11px 5px; border-radius: 13px; text-align: center; background: var(--green-soft); }
+    .check-target strong { display: block; color: var(--green-dark); font-size: .84rem; }
+    .check-target span { display: block; margin-top: 2px; color: var(--muted); font-size: .61rem; }
+    .card { padding: 14px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .card + .card { margin-top: 10px; }
+    .card h2 { margin: 0; font-size: 1rem; letter-spacing: -.02em; }
+    .card-intro { margin: 5px 0 12px; color: var(--muted); font-size: .75rem; line-height: 1.45; }
+    .form-grid { display: grid; gap: 9px; }
+    .field { display: grid; gap: 5px; }
+    .field label { color: #3f4b44; font-size: .71rem; font-weight: 850; }
+    .field input, .field select { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid #bdc9c1; border-radius: 11px; background: #fff; }
+    .form-grid .button { width: 100%; }
+    .recommendation { margin-top: 10px; padding: 12px; border-radius: 13px; background: var(--green-soft); }
+    .recommendation[data-tone="watch"] { background: var(--yellow-soft); }
     .recommendation[data-tone="alert"] { background: var(--red-soft); }
-    .recommendation strong { display: block; margin-bottom: 7px; }
-    .recommendation p { margin: 0; color: #36433e; line-height: 1.55; }
-    .log { margin-top: 22px; border-top: 1px solid var(--line); }
-    .log-row { display: grid; grid-template-columns: 120px 1fr 1fr 38px; align-items: center; min-height: 46px; border-bottom: 1px solid var(--line); font-size: .88rem; }
-    .log-row.head { min-height: 38px; color: var(--muted); font-size: .76rem; font-weight: 800; text-transform: uppercase; }
-    .delete-log { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 5px; color: var(--red); background: transparent; }
-    .delete-log:hover { background: var(--red-soft); }
-    .delete-log svg { width: 17px; }
+    .recommendation strong { display: block; font-size: .8rem; }
+    .recommendation p { margin: 4px 0 0; color: #435047; font-size: .75rem; line-height: 1.45; }
+    .measurement-log { margin-top: 11px; border-top: 1px solid var(--line); }
+    .log-row { min-height: 43px; display: grid; grid-template-columns: 1fr .8fr .8fr 30px; gap: 5px; align-items: center; border-bottom: 1px solid var(--line); font-size: .72rem; }
+    .log-row.head { min-height: 32px; color: var(--muted); font-size: .61rem; font-weight: 900; text-transform: uppercase; }
+    .delete-log { width: 30px; height: 30px; border: 0; border-radius: 8px; color: var(--red); background: transparent; font-size: 1rem; }
+    .reality-note { margin-top: 10px; padding: 12px; border-left: 3px solid var(--orange); border-radius: 0 12px 12px 0; color: #614539; background: var(--orange-soft); font-size: .74rem; line-height: 1.45; }
 
-    .source-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .source { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
-    .source span { color: var(--green); font-size: .76rem; font-weight: 800; text-transform: uppercase; }
-    .source h3 { margin: 7px 0; font-size: 1rem; line-height: 1.35; letter-spacing: 0; }
-    .source p { margin: 0 0 10px; color: var(--muted); font-size: .88rem; line-height: 1.55; }
-    .medical-note { margin-top: 28px; padding: 18px 20px; border-left: 4px solid var(--red); background: var(--red-soft); color: #5f302d; line-height: 1.55; }
-
-    footer.site-footer { padding: 26px 0 38px; color: var(--muted); background: #e8edeb; font-size: .78rem; line-height: 1.55; }
-    .footer-inner { display: flex; justify-content: space-between; gap: 24px; }
-    .footer-inner p { max-width: 680px; margin: 0; }
-
-    @media (max-width: 900px) {
-      .metrics, .meal-grid { grid-template-columns: repeat(2, 1fr); }
-      .recipe-grid { grid-template-columns: repeat(2, 1fr); }
-      .shopping-layout, .checkin-layout { grid-template-columns: 1fr; }
-      .shopping-groups { grid-template-columns: repeat(3, 1fr); }
-      .day-row { grid-template-columns: 74px 1fr 1fr; }
-      .day-total { grid-column: 2 / -1; justify-content: flex-start; }
+    @media (min-width: 700px) {
+      .shell { width: min(100% - 44px, 1060px); }
+      .panel { padding: 24px 0 46px; }
+      .day-picker { margin-inline: 0; padding-inline: 0; }
+      .day-button { flex-basis: 64px; }
+      .meal-list { grid-template-columns: repeat(2, 1fr); }
+      .week-list { grid-template-columns: repeat(2, 1fr); }
+      .prep-grid, .check-layout { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; align-items: start; }
+      .check-layout .card + .card { margin-top: 0; }
+      .shopping-groups { grid-template-columns: repeat(2, 1fr); align-items: start; }
+      .form-grid.two { grid-template-columns: repeat(2, 1fr); }
+      .field.full { grid-column: 1 / -1; }
     }
 
-    @media (max-width: 680px) {
-      .shell { width: min(100% - 24px, 1160px); }
-      .brand strong { display: none; }
-      .topbar-inner { gap: 7px; }
-      .tab { padding: 0 10px; font-size: .82rem; }
-      .hero { min-height: 330px; }
-      .hero .shell { padding: 42px 0 30px; }
-      .hero h1 { font-size: 2rem; }
-      .hero p { font-size: .96rem; }
-      .hero-metrics { gap: 10px 18px; }
-      .band { padding: 36px 0; }
-      .section-head { align-items: start; flex-direction: column; }
-      .verdict { grid-template-columns: 1fr; gap: 24px; }
-      .verdict h2 { font-size: 1.65rem; }
-      .metrics, .meal-grid, .rules, .recipe-grid, .shopping-groups, .prep-grid, .source-list { grid-template-columns: 1fr; }
-      .meal-card { min-height: 0; }
-      .meal-card h3 { min-height: 0; }
-      .day-row { grid-template-columns: 68px 1fr; gap: 9px 12px; padding: 14px; }
-      .day-row .dish { grid-column: 2; }
-      .day-total { grid-column: 2; }
-      .segmented { width: 100%; grid-auto-flow: row; }
-      .shopping-layout { gap: 22px; }
-      .form-grid { grid-template-columns: 1fr; }
-      .field.full { grid-column: auto; }
-      .log-row { grid-template-columns: 96px 1fr 1fr 34px; }
-      .footer-inner { flex-direction: column; }
+    @media (min-width: 880px) {
+      .header-row { min-height: 66px; }
+      .app-nav { position: static; min-height: auto; display: flex; gap: 4px; margin-left: auto; padding: 0; border: 0; background: transparent; box-shadow: none; }
+      .nav-button { min-height: 40px; display: flex; gap: 6px; padding: 7px 11px; font-size: .75rem; }
+      .nav-button svg { width: 18px; height: 18px; }
+      .goal-chip { margin-left: 4px; }
+      main { padding-bottom: 0; }
+      .week-list, .shopping-groups { grid-template-columns: repeat(3, 1fr); }
     }
 
-    @media print {
-      .topbar, .hero, .icon-button, .segmented, .button, .delete-log { display: none !important; }
-      body, .band, .metric, .meal-card, .recipe, .prep-block, .source { background: white !important; box-shadow: none !important; }
-      .panel[hidden] { display: block; }
-      .panel { break-before: page; }
-      .panel:first-child { break-before: auto; }
-      .band { padding: 24px 0; }
-      .shell { width: 100%; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="shell topbar-inner">
-      <a class="brand" href="#piano" aria-label="Cut Smart, piano">
-        <span class="brand-mark">C</span>
-        <strong>CUT SMART</strong>
+  <header class="app-header">
+    <div class="shell header-row">
+      <a class="brand" href="#oggi" data-go="oggi">
+        <span class="brand-mark">CS</span>
+        <span><strong>Cut Smart</strong><small>Il tuo menu personale</small></span>
       </a>
-      <nav class="tabs" role="tablist" aria-label="Sezioni">
-        <button class="tab" id="tab-piano" role="tab" aria-controls="piano" aria-selected="true" data-tab="piano">Piano</button>
-        <button class="tab" id="tab-settimana" role="tab" aria-controls="settimana" aria-selected="false" data-tab="settimana">Settimana</button>
-        <button class="tab" id="tab-spesa" role="tab" aria-controls="spesa" aria-selected="false" data-tab="spesa">Spesa</button>
-        <button class="tab" id="tab-checkin" role="tab" aria-controls="checkin" aria-selected="false" data-tab="checkin">Check-in</button>
-        <button class="tab" id="tab-fonti" role="tab" aria-controls="fonti" aria-selected="false" data-tab="fonti">Fonti</button>
+
+      <nav class="app-nav" aria-label="Sezioni">
+        <button class="nav-button" type="button" data-panel="oggi" aria-current="page">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 2v3M16 2v3M3.5 9h17M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path d="m9.5 15 1.6 1.6 3.7-4"/></svg>
+          <span>Oggi</span>
+        </button>
+        <button class="nav-button" type="button" data-panel="settimana" aria-current="false">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
+          <span>Settimana</span>
+        </button>
+        <button class="nav-button" type="button" data-panel="spesa" aria-current="false">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 8h18l-2 12H5L3 8Z"/><path d="m8 8 4-6 4 6M8 12v4M12 12v4M16 12v4"/></svg>
+          <span>Spesa</span>
+        </button>
+        <button class="nav-button" type="button" data-panel="check" aria-current="false">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          <span>Check</span>
+        </button>
       </nav>
-      <button class="icon-button" type="button" id="print" title="Stampa il piano" aria-label="Stampa il piano"><i data-lucide="printer"></i></button>
+
+      <span class="goal-chip">1.700–1.750 kcal</span>
     </div>
   </header>
 
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="shell">
-      <p class="eyebrow">Piano personale · 31 anni · 164 cm · 70 kg</p>
-      <h1 id="hero-title">Perdere pancia, mantenere forza.</h1>
-      <p>Una base da circa 1.700–1.750 kcal, tarata sui risultati reali e non sulla fretta. Il grasso addominale scende con il grasso totale: non si può scegliere da dove.</p>
-      <div class="hero-metrics" aria-label="Obiettivi principali">
-        <div class="hero-metric"><strong>350–525 g</strong><span>a settimana</span></div>
-        <div class="hero-metric"><strong>145–155 g</strong><span>proteine stimate</span></div>
-        <div class="hero-metric"><strong>3×</strong><span>pesi pesanti</span></div>
-      </div>
-    </div>
-  </section>
-
   <main>
-    <div class="panel" id="piano" role="tabpanel" aria-labelledby="tab-piano">
-      <section class="band white">
-        <div class="shell verdict">
-          <div>
-            <span class="status good">Buona base, con correzioni</span>
-            <h2>Sì: un cut è ragionevole. Ma 1.700 kcal è un test iniziale, non una prescrizione.</h2>
-            <p>Il tuo metabolismo basale stimato è circa 1.575 kcal. Con tre allenamenti a settimana e attività quotidiana da leggera a moderata, il mantenimento potrebbe stare grossomodo tra 2.150 e 2.450 kcal. Di conseguenza 1.700–1.750 kcal può creare un deficit utile, ma va confermato con medie del peso, girovita, fame e prestazioni per almeno 2–3 settimane.</p>
-          </div>
-          <aside class="callout">
-            <strong>Il dato mancante è il girovita.</strong>
-            <p>Il BMI stimato è 26,0, ma non distingue muscolo e grasso. I 14 kg guadagnati da 56 a 70 kg saranno verosimilmente un mix: senza girovita, foto coerenti e trend di forza non si può quantificare.</p>
-          </aside>
-        </div>
-      </section>
+    <section class="panel" id="oggi" aria-labelledby="today-title">
+      <div class="shell">
+        <div class="day-picker" id="day-picker" aria-label="Scegli il giorno"></div>
 
-      <section class="band">
-        <div class="shell">
-          <div class="section-head">
-            <div><h2>I numeri da seguire</h2><p>Intervalli operativi. Le etichette degli alimenti e la risposta del corpo hanno precedenza sulle stime.</p></div>
-          </div>
-          <div class="metrics">
-            <article class="metric"><span>Partenza</span><strong>1.700–1.750</strong><small>kcal al giorno per 2–3 settimane</small></article>
-            <article class="metric"><span>Velocità ideale</span><strong>0,5–0,75%</strong><small>del peso a settimana, circa 350–525 g</small></article>
-            <article class="metric"><span>Proteine</span><strong>2,0–2,2 g/kg</strong><small>140–155 g al giorno sono sufficienti</small></article>
-            <article class="metric"><span>Controllo</span><strong>7 giorni</strong><small>usa la media, non il singolo peso</small></article>
-          </div>
-        </div>
-      </section>
+        <header class="today-summary" aria-live="polite">
+          <div><small id="today-context">Oggi mangi</small><h1 id="today-title">Lunedì</h1></div>
+          <div class="today-total"><strong id="today-kcal">1.685 kcal</strong><span id="today-protein">147 g proteine</span></div>
+        </header>
 
-      <section class="band white">
-        <div class="shell">
-          <div class="section-head">
-            <div><h2 id="today-title">Oggi</h2><p id="today-summary"></p></div>
-            <span class="status watch">Valori indicativi</span>
-          </div>
-          <div class="meal-grid" id="today-meals"></div>
-        </div>
-      </section>
+        <div class="meal-list" id="meal-list"></div>
+        <div id="prep-alert"></div>
 
-      <section class="band">
-        <div class="shell rules">
-          <article class="rule"><i data-lucide="scale"></i><div><h3>Pesi coerenti</h3><p>Pasta, riso e avena da secchi; pollo, merluzzo e patate da crudi; tonno sgocciolato; olio sempre pesato.</p></div></article>
-          <article class="rule"><i data-lucide="dumbbell"></i><div><h3>Forza prima del volume</h3><p>Mantieni tre sedute con carichi impegnativi e progressione. Se la forza crolla per due settimane, il deficit è probabilmente troppo aggressivo.</p></div></article>
-          <article class="rule"><i data-lucide="target"></i><div><h3>Niente dimagrimento localizzato</h3><p>Gli addominali allenano il muscolo, ma non eliminano selettivamente il grasso della pancia. Servono deficit, tempo e costanza.</p></div></article>
+        <div class="quick-actions">
+          <button class="button" type="button" data-go="spesa">Lista della spesa</button>
+          <button class="button secondary" type="button" data-go="settimana">Tutta la settimana</button>
         </div>
-      </section>
-    </div>
 
-    <div class="panel" id="settimana" role="tabpanel" aria-labelledby="tab-settimana" hidden>
-      <section class="band white">
-        <div class="shell">
-          <div class="section-head">
-            <div><h2>Sette giorni completi</h2><p>Ogni giorno include la stessa colazione, uno spuntino con il secondo frutto e due piatti. Media stimata: circa 1.730 kcal e 150–155 g di proteine.</p></div>
-          </div>
-          <div class="week-list" id="week-list"></div>
+        <div class="rule-bar"><strong>Per proteggere i muscoli:</strong> 3 allenamenti con i pesi, proteine ogni giorno e perdita media di circa 350–525 g a settimana.</div>
+      </div>
+    </section>
+
+    <section class="panel" id="settimana" aria-labelledby="week-title" hidden>
+      <div class="shell">
+        <header class="panel-head">
+          <h1 id="week-title">Cosa mangio questa settimana?</h1>
+          <p>Apri un giorno e vedi subito i quattro pasti. Tocca “Apri ricette” per tornare alle istruzioni complete.</p>
+        </header>
+
+        <div class="summary-grid">
+          <div class="summary-box"><strong>≈ 1.731</strong><span>kcal medie</span></div>
+          <div class="summary-box"><strong>≈ 151 g</strong><span>proteine medie</span></div>
+          <div class="summary-box"><strong>2 volte</strong><span>meal prep</span></div>
         </div>
-      </section>
 
-      <section class="band">
-        <div class="shell">
-          <div class="section-head"><div><h2>Porzioni corrette per il target</h2><p>Le porzioni originali da 300 g di patate e 10 g di olio restano valide, ma portano diversi giorni più vicino a 1.800–1.900 kcal.</p></div></div>
-          <div class="recipe-grid" id="recipe-grid"></div>
-        </div>
-      </section>
-    </div>
+        <div class="week-list" id="week-list"></div>
 
-    <div class="panel" id="spesa" role="tabpanel" aria-labelledby="tab-spesa" hidden>
-      <section class="band white">
-        <div class="shell">
-          <div class="section-head">
-            <div><h2>Spesa 7 giorni</h2><p>La lista esatta segue il menu settimanale. La lista originale resta disponibile come scorta più abbondante.</p></div>
-            <div class="segmented" aria-label="Tipo di lista">
-              <button class="segment" type="button" data-list="exact" aria-pressed="true">Esatta 7 giorni</button>
-              <button class="segment" type="button" data-list="original" aria-pressed="false">Originale</button>
-            </div>
-          </div>
-          <div class="shopping-layout">
-            <div class="shopping-groups" id="shopping-groups"></div>
-            <aside class="audit">
-              <h3>Perché la lista cambia</h3>
-              <ul>
-                <li>Il secondo frutto completa lo spuntino e spiega i 14 frutti acquistati.</li>
-                <li>850 g di pollo bastano per i cinque pasti pianificati; 1,4 kg lasciano circa 550 g di scorta.</li>
-                <li>Sei scatolette piccole coprono tre porzioni da circa 140 g sgocciolati.</li>
-                <li>Le 10 uova servono tra frittate e due spuntini; non vanno tutte bollite.</li>
-              </ul>
-            </aside>
-          </div>
-        </div>
-      </section>
-
-      <section class="band">
-        <div class="shell">
-          <div class="section-head"><div><h2>Preparazione due volte a settimana</h2><p>I cibi cotti refrigerati si gestiscono in blocchi brevi; congela le porzioni che superano 3–4 giorni.</p></div></div>
+        <section class="section">
+          <div class="section-title"><h2>Meal prep: solo due volte</h2><p>Prepari le basi; pasta, merluzzo e frittata restano veloci e più buoni fatti al momento.</p></div>
           <div class="prep-grid">
-            <article class="prep-block"><h3>Domenica</h3><ul><li>500 g pollo</li><li>750 g patate</li><li>120 g riso</li><li>2–3 porzioni di verdure</li></ul></article>
-            <article class="prep-block"><h3>Mercoledì</h3><ul><li>350 g pollo</li><li>500 g patate</li><li>60 g riso</li><li>4 uova sode per gli spuntini</li></ul></article>
+            <article class="prep-card">
+              <header><h3>Domenica</h3><span>25 minuti</span></header>
+              <ol>
+                <li>Cuoci <strong>340 g di pollo</strong> con paprika, aglio e limone.</li>
+                <li>Prepara <strong>60 g di riso</strong> e <strong>500 g di patate</strong>.</li>
+                <li>Dividi per i pasti di martedì e mercoledì.</li>
+              </ol>
+            </article>
+            <article class="prep-card">
+              <header><h3>Mercoledì</h3><span>30 minuti</span></header>
+              <ol>
+                <li>Cuoci <strong>510 g di pollo</strong>: metà curry, metà paprika.</li>
+                <li>Prepara <strong>120 g di riso</strong> e <strong>750 g di patate</strong>.</li>
+                <li>Dividi per giovedì–domenica e congela le porzioni di domenica.</li>
+              </ol>
+            </article>
           </div>
-        </div>
-      </section>
-    </div>
+          <div class="shopping-note"><strong>Conservazione:</strong> metti in frigo entro 2 ore e consuma entro 3–4 giorni. Scongela le porzioni in frigorifero.</div>
+        </section>
+      </div>
+    </section>
 
-    <div class="panel" id="checkin" role="tabpanel" aria-labelledby="tab-checkin" hidden>
-      <section class="band white">
-        <div class="shell">
-          <div class="section-head"><div><h2>Check-in settimanale</h2><p>La decisione si basa sul trend del peso insieme a girovita e prestazioni. Creatina e sale possono spostare l’acqua senza cambiare il grasso.</p></div></div>
-          <div class="checkin-layout">
-            <div>
-              <form id="log-form" class="form-grid">
-                <div class="field"><label for="log-date">Data</label><input id="log-date" name="date" type="date" required></div>
-                <div class="field"><label for="log-weight">Peso (kg)</label><input id="log-weight" name="weight" type="number" min="40" max="140" step="0.1" placeholder="70,0" required></div>
-                <div class="field"><label for="log-waist">Girovita (cm)</label><input id="log-waist" name="waist" type="number" min="50" max="160" step="0.5" placeholder="85,0"></div>
-                <div class="field" style="align-self:end"><button class="button" type="submit"><i data-lucide="plus"></i>Aggiungi</button></div>
-              </form>
-              <div class="log" id="measurement-log"></div>
+    <section class="panel" id="spesa" aria-labelledby="shopping-title" hidden>
+      <div class="shell">
+        <header class="panel-head">
+          <h1 id="shopping-title">Spesa per 7 giorni</h1>
+          <p>Quantità semplici da comprare. Spunta direttamente mentre sei al supermercato: il telefono ricorda tutto.</p>
+        </header>
+
+        <section class="shopping-progress" aria-label="Avanzamento spesa">
+          <div class="progress-head">
+            <div><h2>La tua lista</h2><p id="shopping-message">Inizia dalle proteine.</p></div>
+            <div class="progress-count"><strong id="shopping-count">0/21</strong><span>presi</span></div>
+          </div>
+          <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="shopping-progress"></div></div>
+        </section>
+
+        <div class="shopping-tools">
+          <label class="remaining"><input id="remaining-only" type="checkbox"> Mostra solo ciò che manca</label>
+          <button class="reset" id="reset-shopping" type="button">Azzera</button>
+        </div>
+
+        <div class="shopping-groups" id="shopping-groups"></div>
+        <div class="shopping-note"><strong>Per farli buoni:</strong> non saltare paprika affumicata, curry, origano, aglio, limone e salsa di soia light. Danno sapore in pochi secondi.</div>
+      </div>
+    </section>
+
+    <section class="panel" id="check" aria-labelledby="check-title" hidden>
+      <div class="shell">
+        <header class="panel-head">
+          <h1 id="check-title">Check della settimana</h1>
+          <p>Due minuti ogni domenica: controlli se stai perdendo grasso senza tagliare troppo e compromettere la forza.</p>
+        </header>
+
+        <div class="check-targets">
+          <div class="check-target"><strong>−0,35/0,53 kg</strong><span>a settimana</span></div>
+          <div class="check-target"><strong>Forza stabile</strong><span>in palestra</span></div>
+          <div class="check-target"><strong>Vita in calo</strong><span>trend mensile</span></div>
+        </div>
+
+        <div class="check-layout">
+          <article class="card">
+            <h2>Il ritmo è giusto?</h2>
+            <p class="card-intro">Confronta due medie settimanali, non due singole pesate.</p>
+            <form id="adjust-form" class="form-grid two">
+              <div class="field"><label for="previous-average">Media settimana scorsa (kg)</label><input id="previous-average" type="number" min="40" max="140" step="0.1" inputmode="decimal" placeholder="70,0" required></div>
+              <div class="field"><label for="current-average">Media questa settimana (kg)</label><input id="current-average" type="number" min="40" max="140" step="0.1" inputmode="decimal" placeholder="69,6" required></div>
+              <div class="field full"><label for="performance">Forza negli allenamenti</label><select id="performance"><option value="stable">Stabile</option><option value="up">In crescita</option><option value="down">In calo da due settimane</option></select></div>
+              <div class="field full"><button class="button" type="submit">Dimmi cosa fare</button></div>
+            </form>
+            <div class="recommendation" id="recommendation" aria-live="polite">
+              <strong>Obiettivo settimanale</strong>
+              <p>Perdi circa 350–525 g mantenendo la forza. È più utile che cercare di dimagrire il più velocemente possibile.</p>
             </div>
+          </article>
 
-            <div>
-              <form id="adjust-form" class="form-grid">
-                <div class="field"><label for="previous-average">Media settimana prima (kg)</label><input id="previous-average" type="number" min="40" max="140" step="0.1" placeholder="70,0" required></div>
-                <div class="field"><label for="current-average">Media settimana attuale (kg)</label><input id="current-average" type="number" min="40" max="140" step="0.1" placeholder="69,6" required></div>
-                <div class="field full"><label for="performance">Prestazioni in palestra</label><select id="performance"><option value="stable">Stabili</option><option value="up">In crescita</option><option value="down">In calo da due settimane</option></select></div>
-                <div class="field full"><button class="button secondary" type="submit"><i data-lucide="calculator"></i>Valuta il ritmo</button></div>
-              </form>
-              <div class="recommendation" id="recommendation" aria-live="polite">
-                <strong>Target: −0,35 / −0,53 kg a settimana</strong>
-                <p>È abbastanza rapido da vedere progressi, ma più prudente del limite superiore di 700 g per proteggere forza e massa magra.</p>
-              </div>
-            </div>
-          </div>
+          <article class="card">
+            <h2>Salva peso e girovita</h2>
+            <p class="card-intro">Misurali al mattino, nelle stesse condizioni.</p>
+            <form id="log-form" class="form-grid two">
+              <div class="field"><label for="log-date">Data</label><input id="log-date" name="date" type="date" required></div>
+              <div class="field"><label for="log-weight">Peso (kg)</label><input id="log-weight" name="weight" type="number" min="40" max="140" step="0.1" inputmode="decimal" placeholder="69,7" required></div>
+              <div class="field"><label for="log-waist">Girovita (cm)</label><input id="log-waist" name="waist" type="number" min="50" max="160" step="0.5" inputmode="decimal" placeholder="85,0"></div>
+              <div class="field" style="align-self:end"><button class="button secondary" type="submit">Salva</button></div>
+            </form>
+            <div class="measurement-log" id="measurement-log"></div>
+          </article>
         </div>
-      </section>
-    </div>
 
-    <div class="panel" id="fonti" role="tabpanel" aria-labelledby="tab-fonti" hidden>
-      <section class="band white">
-        <div class="shell">
-          <div class="section-head"><div><h2>Verifica scientifica</h2><p>Le conclusioni sono una sintesi prudente delle evidenze, non una garanzia individuale di risultato.</p></div></div>
-          <div class="source-list">
-            <article class="source"><span>Proteine</span><h3>Intake elevato durante restrizione calorica</h3><p>Negli atleti allenati, introiti più alti possono aiutare a preservare massa magra durante un deficit.</p><a href="https://pubmed.ncbi.nlm.nih.gov/24092765/" target="_blank" rel="noreferrer">Revisione su PubMed</a></article>
-            <article class="source"><span>Ricomposizione</span><h3>Più proteine più allenamento intenso</h3><p>Un trial su giovani uomini mostra che aumentare massa magra in deficit è possibile, ma in condizioni specifiche e non garantibili.</p><a href="https://pubmed.ncbi.nlm.nih.gov/26817506/" target="_blank" rel="noreferrer">Trial su PubMed</a></article>
-            <article class="source"><span>Grasso addominale</span><h3>Gli addominali non fanno “spot reduction”</h3><p>Sei settimane di esercizi addominali migliorarono la resistenza, non il grasso addominale.</p><a href="https://pubmed.ncbi.nlm.nih.gov/21804427/" target="_blank" rel="noreferrer">Trial su PubMed</a></article>
-            <article class="source"><span>Creatina</span><h3>Uso quotidiano negli adulti sani</h3><p>La posizione ISSN supporta efficacia e sicurezza della creatina negli individui sani; 3–5 g al giorno è l’approccio pratico abituale.</p><a href="https://pubmed.ncbi.nlm.nih.gov/28615996/" target="_blank" rel="noreferrer">Position stand su PubMed</a></article>
-            <article class="source"><span>Calorie</span><h3>Stima del metabolismo basale</h3><p>La stima di circa 1.575 kcal deriva dall’equazione Mifflin–St Jeor; il dispendio totale resta un intervallo da verificare.</p><a href="https://pubmed.ncbi.nlm.nih.gov/2305711/" target="_blank" rel="noreferrer">Studio dell’equazione</a></article>
-            <article class="source"><span>Velocità</span><h3>Dimagrimento graduale e sostenibile</h3><p>Le indicazioni sanitarie generali favoriscono una perdita graduale; per preservare muscolo qui viene usata la parte più prudente del range.</p><a href="https://www.cdc.gov/healthy-weight-growth/losing-weight/index.html" target="_blank" rel="noreferrer">Indicazioni CDC</a></article>
-          </div>
-          <div class="medical-note"><strong>Prima la salute.</strong> Un deficit calorico e la creatina vanno discussi con medico o dietista in presenza di malattie renali, diabete, disturbi alimentari, farmaci rilevanti o sintomi persistenti. Dolore, capogiri, stanchezza marcata o calo rapido e continuo richiedono una valutazione professionale.</div>
-        </div>
-      </section>
-    </div>
+        <div class="reality-note"><strong>Una cosa importante:</strong> non puoi scegliere di perdere solo il grasso della pancia. Se girovita e media del peso scendono mentre la forza regge, il piano sta funzionando. Mettere massa durante il cut è possibile, ma mantenere o aumentare la forza è il segnale più realistico da seguire.</div>
+      </div>
+    </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="shell footer-inner">
-      <p>Stime nutrizionali basate su valori medi: controlla le etichette dei prodotti. Questo piano non sostituisce una valutazione clinica o dietistica individuale.</p>
-      <p>Foto: <a href="https://commons.wikimedia.org/wiki/File:Meal_prep_glass_container_(45165270525).jpg" target="_blank" rel="noreferrer">Ella Olsson</a>, <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noreferrer">CC BY 2.0</a>.</p>
-    </div>
-  </footer>
-
-  <script src="assets/lucide.min.js"></script>
   <script>
     const meals = {
-      breakfast: { type: "Colazione", name: "Yogurt, avena e frutta", items: ["300 g yogurt greco 0%", "40 g avena", "1 frutto"], kcal: 420, protein: 37 },
-      cottage: { type: "Spuntino", name: "Fiocchi di latte e frutta", items: ["200 g fiocchi di latte", "1 frutto"], kcal: 250, protein: 24 },
-      eggs: { type: "Spuntino", name: "Uova, albume e frutta", items: ["2 uova", "150 g albume", "1 frutto"], kcal: 310, protein: 29 },
-      pasta: { type: "Piatto", name: "Pasta e tonno", items: ["80 g pasta", "140 g tonno sgocciolato", "passata + 5 g olio"], kcal: 525, protein: 45 },
-      rice: { type: "Piatto", name: "Riso e pollo", items: ["60 g riso", "170 g pollo", "verdure + 5 g olio"], kcal: 550, protein: 45 },
-      chicken: { type: "Piatto", name: "Pollo e patate", items: ["170 g pollo", "250 g patate", "verdure + 5 g olio"], kcal: 525, protein: 46 },
-      cod: { type: "Piatto", name: "Merluzzo e patate", items: ["220 g merluzzo", "250 g patate", "verdure + 5 g olio"], kcal: 520, protein: 46 },
-      omelette: { type: "Piatto", name: "Frittata veloce", items: ["2 uova + 200 g albume", "80 g pane", "insalata"], kcal: 490, protein: 41 }
+      breakfast: {
+        emoji: "🥣", name: "Yogurt bowl croccante", time: "2 min", kcal: 420, protein: 37,
+        ingredients: [["300 g", "yogurt greco 0%"], ["40 g", "avena"], ["1", "{fruit}"], ["q.b.", "cannella"]],
+        taste: "Cannella e scorza di limone.",
+        method: "Mescola yogurt e avena, aggiungi la frutta a pezzi e completa con cannella e scorza di limone."
+      },
+      cottage: {
+        emoji: "🍎", name: "Fiocchi di latte dolci", time: "2 min", kcal: 250, protein: 24,
+        ingredients: [["200 g", "fiocchi di latte"], ["1", "{fruit}"], ["q.b.", "cannella"]],
+        taste: "Schiaccia metà frutta dentro: diventa più cremoso.",
+        method: "Taglia la frutta, schiacciane metà nei fiocchi di latte e usa il resto sopra con cannella."
+      },
+      eggs: {
+        emoji: "🍳", name: "Uova strapazzate express", time: "6 min", kcal: 310, protein: 29,
+        ingredients: [["2", "uova"], ["150 g", "albume"], ["1", "{fruit}"], ["q.b.", "paprika"]],
+        taste: "Paprika affumicata e pepe nero.",
+        method: "Sbatti uova, albume, paprika e pepe. Versa in padella antiaderente calda e gira per 4–5 minuti. Frutta a parte."
+      },
+      pasta: {
+        emoji: "🍝", name: "Pasta al tonno piccante", time: "12 min", kcal: 525, protein: 45,
+        ingredients: [["80 g", "pasta"], ["140 g", "tonno sgocciolato"], ["150 g", "passata"], ["5 g", "olio EVO"]],
+        taste: "Origano, peperoncino e capperi opzionali.",
+        method: "Mentre cuoce la pasta, scalda passata, origano e peperoncino. Spegni, aggiungi il tonno, manteca la pasta e metti l'olio a crudo."
+      },
+      rice: {
+        emoji: "🍛", name: "Riso e pollo al curry", time: "6 min", kcal: 550, protein: 45,
+        ingredients: [["60 g", "riso"], ["170 g", "pollo"], ["250 g", "verdure"], ["5 g", "olio EVO"]],
+        taste: "Curry, soia light e una spruzzata di limone.",
+        method: "Scalda pollo e riso già pronti con le verdure, curry e poca salsa di soia. Spegni e aggiungi olio e limone."
+      },
+      chicken: {
+        emoji: "🍗", name: "Pollo e patate croccanti", time: "8 min", kcal: 525, protein: 46,
+        ingredients: [["170 g", "pollo"], ["250 g", "patate"], ["250 g", "verdure"], ["5 g", "olio EVO"]],
+        taste: "Paprika affumicata, aglio e limone.",
+        method: "Ripassa pollo e patate già cotti in padella o friggitrice ad aria finché sono croccanti. Aggiungi verdure, olio e limone."
+      },
+      cod: {
+        emoji: "🐟", name: "Merluzzo aglio e limone", time: "12 min", kcal: 520, protein: 46,
+        ingredients: [["220 g", "merluzzo"], ["250 g", "patate"], ["250 g", "verdure"], ["5 g", "olio EVO"]],
+        taste: "Limone, aglio, prezzemolo e pepe.",
+        method: "Metti il merluzzo in padella con aglio, limone e due cucchiai d'acqua. Copri 8–10 minuti; servi con patate e verdure calde, olio a crudo."
+      },
+      omelette: {
+        emoji: "🥚", name: "Frittata morbida e pane", time: "8 min", kcal: 490, protein: 41,
+        ingredients: [["2", "uova"], ["200 g", "albume"], ["80 g", "pane"], ["1 porzione", "insalata"]],
+        taste: "Paprika, origano e insalata al limone.",
+        method: "Sbatti uova, albume, paprika e origano. Cuoci coperto in padella antiaderente per 6–7 minuti; accompagna con pane tostato e insalata."
+      }
     };
 
     const schedule = [
-      { day: "Lunedì", snack: "cottage", lunch: "pasta", dinner: "omelette" },
-      { day: "Martedì", snack: "cottage", lunch: "rice", dinner: "cod" },
-      { day: "Mercoledì", snack: "eggs", lunch: "chicken", dinner: "pasta" },
-      { day: "Giovedì", snack: "cottage", lunch: "omelette", dinner: "cod" },
-      { day: "Venerdì", snack: "cottage", lunch: "rice", dinner: "pasta" },
-      { day: "Sabato", snack: "eggs", lunch: "chicken", dinner: "omelette" },
-      { day: "Domenica", snack: "cottage", lunch: "rice", dinner: "cod" }
+      { day: "Lunedì", short: "Lun", snack: "cottage", lunch: "pasta", dinner: "omelette" },
+      { day: "Martedì", short: "Mar", snack: "cottage", lunch: "rice", dinner: "cod" },
+      { day: "Mercoledì", short: "Mer", snack: "eggs", lunch: "chicken", dinner: "pasta" },
+      { day: "Giovedì", short: "Gio", snack: "cottage", lunch: "omelette", dinner: "cod" },
+      { day: "Venerdì", short: "Ven", snack: "cottage", lunch: "rice", dinner: "pasta" },
+      { day: "Sabato", short: "Sab", snack: "eggs", lunch: "chicken", dinner: "omelette" },
+      { day: "Domenica", short: "Dom", snack: "cottage", lunch: "rice", dinner: "cod" }
     ];
 
-    const recipes = ["pasta", "rice", "chicken", "cod", "omelette"];
-    const shopping = {
-      exact: {
-        "Proteine": ["850 g pollo o tacchino", "6 scatolette piccole di tonno al naturale", "750 g merluzzo surgelato", "10–12 uova", "1 litro albume", "2,1 kg yogurt greco 0%", "1 kg fiocchi di latte"],
-        "Carboidrati": ["250–300 g pasta", "200 g riso", "1,5 kg patate", "300 g avena", "300 g pane", "7 banane", "7 mele"],
-        "Verdure e condimenti": ["3 kg verdure surgelate", "2 buste insalata", "passata di pomodoro", "olio EVO", "limone e spezie", "salsa di soia light"]
-      },
-      original: {
-        "Proteine": ["1,4 kg pollo o tacchino", "8 scatolette tonno al naturale", "750 g merluzzo surgelato", "14 uova", "1 litro albume", "2,1 kg yogurt greco 0%", "1 kg fiocchi di latte"],
-        "Carboidrati": ["350 g pasta", "300 g riso", "2 kg patate", "300 g avena", "500 g pane", "7 banane", "7 mele"],
-        "Verdure e condimenti": ["3 kg verdure surgelate", "2 buste insalata", "passata di pomodoro", "olio EVO", "limone e spezie", "salsa di soia light"]
-      }
-    };
+    const shopping = [
+      { group: "Proteine", icon: "🥩", items: [
+        { id: "chicken", amount: "1 kg", name: "Pollo o tacchino", note: "ne userai 850 g" },
+        { id: "tuna", amount: "6 scatolette", name: "Tonno al naturale", note: "circa 420 g sgocciolato" },
+        { id: "cod", amount: "1 busta da 750 g", name: "Merluzzo surgelato", note: "ne userai circa 660 g" }
+      ]},
+      { group: "Frigo", icon: "🥚", items: [
+        { id: "eggs", amount: "10–12", name: "Uova" },
+        { id: "whites", amount: "1 litro", name: "Albume" },
+        { id: "yogurt", amount: "2,1 kg", name: "Yogurt greco 0%", note: "7 porzioni da 300 g" },
+        { id: "cottage", amount: "1 kg", name: "Fiocchi di latte" }
+      ]},
+      { group: "Carboidrati", icon: "🍚", items: [
+        { id: "pasta", amount: "1 pacco", name: "Pasta", note: "ne userai 240 g" },
+        { id: "rice", amount: "1 pacco", name: "Riso", note: "ne userai 180 g" },
+        { id: "potatoes", amount: "1,5 kg", name: "Patate", note: "ne userai 1,25 kg" },
+        { id: "oats", amount: "1 pacco", name: "Avena", note: "ne userai 280 g" },
+        { id: "bread", amount: "1 confezione", name: "Pane", note: "almeno 240 g" }
+      ]},
+      { group: "Frutta e verdura", icon: "🥦", items: [
+        { id: "bananas", amount: "7", name: "Banane" },
+        { id: "apples", amount: "7", name: "Mele" },
+        { id: "vegetables", amount: "2 kg", name: "Verdure surgelate" },
+        { id: "salad", amount: "2 buste", name: "Insalata" },
+        { id: "lemons", amount: "2", name: "Limoni" }
+      ]},
+      { group: "Sapore", icon: "🧂", items: [
+        { id: "passata", amount: "1 bottiglia", name: "Passata di pomodoro", note: "almeno 500 g" },
+        { id: "oil", amount: "1 bottiglia", name: "Olio EVO" },
+        { id: "soy", amount: "1 bottiglietta", name: "Salsa di soia light" },
+        { id: "spices", amount: "Controlla", name: "Paprika, curry, origano, aglio e cannella" }
+      ]}
+    ];
 
     const store = {
       get(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
       set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }
     };
 
-    const totals = day => ["breakfast", day.snack, day.lunch, day.dinner].reduce((sum, key) => ({ kcal: sum.kcal + meals[key].kcal, protein: sum.protein + meals[key].protein }), { kcal: 0, protein: 0 });
-    const italianDayIndex = () => (new Date().getDay() + 6) % 7;
+    const panels = ["oggi", "settimana", "spesa", "check"];
+    const aliases = { piano: "oggi", progressi: "check", checkin: "check", fonti: "check" };
+    const todayIndex = () => (new Date().getDay() + 6) % 7;
+    const weekDate = index => {
+      const date = new Date();
+      date.setDate(date.getDate() + index - todayIndex());
+      return date;
+    };
     const localDate = () => {
       const date = new Date();
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     };
+    const dayMeals = day => ["breakfast", day.snack, day.lunch, day.dinner];
+    const totals = day => dayMeals(day).reduce((sum, key) => ({ kcal: sum.kcal + meals[key].kcal, protein: sum.protein + meals[key].protein }), { kcal: 0, protein: 0 });
+    const fruitFor = (dayIndex, breakfast) => {
+      const first = dayIndex % 2 === 0 ? "banana" : "mela";
+      return breakfast ? first : first === "banana" ? "mela" : "banana";
+    };
 
-    function mealCard(key) {
-      const meal = meals[key];
-      return `<article class="meal-card"><span class="meal-type">${meal.type}</span><h3>${meal.name}</h3><ul>${meal.items.map(item => `<li>${item}</li>`).join("")}</ul><footer><span class="chip">≈ ${meal.kcal} kcal</span><span class="chip">${meal.protein} g pro</span></footer></article>`;
+    let selectedDay = todayIndex();
+
+    function setPanel(requested, scroll = true) {
+      const name = aliases[requested] || requested;
+      const selected = panels.includes(name) ? name : "oggi";
+      document.querySelectorAll(".panel").forEach(panel => panel.hidden = panel.id !== selected);
+      document.querySelectorAll(".nav-button").forEach(button => button.setAttribute("aria-current", button.dataset.panel === selected ? "page" : "false"));
+      history.replaceState(null, "", `#${selected}`);
+      if (scroll) window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    function renderToday() {
-      const day = schedule[italianDayIndex()];
+    function renderDayPicker() {
+      const today = todayIndex();
+      document.querySelector("#day-picker").innerHTML = schedule.map((day, index) => `
+        <button class="day-button${index === today ? " is-today" : ""}" type="button" data-day="${index}" aria-pressed="${index === selectedDay}">
+          <span>${day.short}</span><strong>${index === today ? "Oggi" : weekDate(index).getDate()}</strong>
+        </button>`).join("");
+    }
+
+    function mealCard(key, index, dayIndex) {
+      const meal = meals[key];
+      const slots = ["Colazione", "Spuntino", "Pranzo", "Cena"];
+      const fruit = fruitFor(dayIndex, key === "breakfast");
+      const ingredients = meal.ingredients.map(([amount, name]) => `<li><b>${amount}</b> ${name.replace("{fruit}", fruit)}</li>`).join("");
+      return `<article class="meal-card">
+        <div class="meal-main">
+          <div class="meal-top">
+            <div class="meal-slot"><span class="meal-emoji" aria-hidden="true">${meal.emoji}</span><div><span>${slots[index]}</span><strong>${meal.kcal} kcal · ${meal.protein} g proteine</strong></div></div>
+            <span class="time">${meal.time}</span>
+          </div>
+          <h2>${meal.name}</h2>
+          <ul class="ingredients">${ingredients}</ul>
+          <p class="taste">✨ <strong>Buono con:</strong> ${meal.taste}</p>
+        </div>
+        <details class="recipe"><summary>Come si prepara</summary><p>${meal.method}</p></details>
+      </article>`;
+    }
+
+    function renderSelectedDay() {
+      const day = schedule[selectedDay];
       const total = totals(day);
-      document.querySelector("#today-title").textContent = `Oggi · ${day.day}`;
-      document.querySelector("#today-summary").textContent = `Circa ${total.kcal.toLocaleString("it-IT")} kcal e ${total.protein} g di proteine.`;
-      document.querySelector("#today-meals").innerHTML = ["breakfast", day.snack, day.lunch, day.dinner].map(mealCard).join("");
+      document.querySelector("#today-context").textContent = selectedDay === todayIndex() ? "Oggi mangi" : "Giorno selezionato";
+      document.querySelector("#today-title").textContent = day.day;
+      document.querySelector("#today-kcal").textContent = `${total.kcal.toLocaleString("it-IT")} kcal`;
+      document.querySelector("#today-protein").textContent = `${total.protein} g proteine`;
+      document.querySelector("#meal-list").innerHTML = dayMeals(day).map((key, index) => mealCard(key, index, selectedDay)).join("");
+      document.querySelectorAll(".day-button").forEach(button => button.setAttribute("aria-pressed", Number(button.dataset.day) === selectedDay));
+
+      const prep = {
+        2: ["Meal prep questa sera", "Prepara 510 g di pollo, 120 g di riso e 750 g di patate. Congela le porzioni di domenica."],
+        6: ["Meal prep per iniziare facile", "Prepara 340 g di pollo, 60 g di riso e 500 g di patate per martedì e mercoledì."]
+      };
+      document.querySelector("#prep-alert").innerHTML = prep[selectedDay] ? `<aside class="prep-alert"><strong>⏱️ ${prep[selectedDay][0]}</strong><p>${prep[selectedDay][1]}</p></aside>` : "";
     }
 
     function renderWeek() {
-      const today = italianDayIndex();
+      const today = todayIndex();
       document.querySelector("#week-list").innerHTML = schedule.map((day, index) => {
         const total = totals(day);
-        return `<article class="day-row${index === today ? " today" : ""}"><strong>${day.day}</strong><span class="dish">Pranzo · ${meals[day.lunch].name}</span><span class="dish">Cena · ${meals[day.dinner].name}</span><span class="day-total"><span class="chip">${total.kcal} kcal</span><span class="chip">${total.protein} g</span></span></article>`;
-      }).join("");
-      document.querySelector("#recipe-grid").innerHTML = recipes.map(key => {
-        const meal = meals[key];
-        return `<article class="recipe"><h3>${meal.name}</h3><p>${meal.items.join(" · ")}</p><span class="chip">≈ ${meal.kcal} kcal · ${meal.protein} g pro</span></article>`;
+        const names = [
+          `${meals.breakfast.name} + ${fruitFor(index, true)}`,
+          `${meals[day.snack].name} + ${fruitFor(index, false)}`,
+          meals[day.lunch].name,
+          meals[day.dinner].name
+        ];
+        return `<details class="week-day" ${index === today ? "open" : ""}>
+          <summary>
+            <span class="week-date"><span>${day.short}</span><strong>${index === today ? "Oggi" : weekDate(index).getDate()}</strong></span>
+            <span class="week-copy"><strong>${day.day}</strong><span>${meals[day.lunch].name} · ${meals[day.dinner].name}</span></span>
+            <span class="week-total">${total.kcal}<span>${total.protein} g pro</span></span>
+          </summary>
+          <div class="week-detail">
+            ${["Colazione", "Spuntino", "Pranzo", "Cena"].map((slot, mealIndex) => `<div class="week-meal"><span>${slot}</span><strong>${names[mealIndex]}</strong></div>`).join("")}
+            <button class="button secondary small" type="button" data-open-day="${index}">Apri ricette</button>
+          </div>
+        </details>`;
       }).join("");
     }
 
-    let activeList = "exact";
     function renderShopping() {
-      const checked = store.get(`cut-shopping-${activeList}`, []);
-      document.querySelector("#shopping-groups").innerHTML = Object.entries(shopping[activeList]).map(([group, items]) => `<section class="shopping-group"><h3>${group}</h3><div class="checklist">${items.map((item, index) => {
-        const id = `${activeList}-${group}-${index}`.replaceAll(" ", "-");
-        return `<label class="check-item" for="${id}"><input id="${id}" type="checkbox" data-item="${group}|${item}" ${checked.includes(`${group}|${item}`) ? "checked" : ""}><span>${item}</span></label>`;
-      }).join("")}</div></section>`).join("");
+      const checked = store.get("cut-shopping-v2", []);
+      document.querySelector("#shopping-groups").innerHTML = shopping.map(group => `<section class="shopping-group" data-group>
+        <h2><span aria-hidden="true">${group.icon}</span>${group.group}</h2>
+        <div class="checklist">${group.items.map(item => `<label class="check-item" data-item>
+          <input type="checkbox" value="${item.id}" ${checked.includes(item.id) ? "checked" : ""}>
+          <span class="item-copy"><strong>${item.amount}</strong><span>${item.name}${item.note ? `<small>${item.note}</small>` : ""}</span></span>
+        </label>`).join("")}</div>
+      </section>`).join("");
+      updateShopping();
     }
 
-    function setTab(name) {
-      const valid = ["piano", "settimana", "spesa", "checkin", "fonti"];
-      const selected = valid.includes(name) ? name : "piano";
-      document.querySelectorAll(".tab").forEach(button => button.setAttribute("aria-selected", button.dataset.tab === selected));
-      document.querySelectorAll(".panel").forEach(panel => panel.hidden = panel.id !== selected);
-      history.replaceState(null, "", `#${selected}`);
-      window.scrollTo({ top: document.querySelector(".hero").offsetTop, behavior: "smooth" });
+    function updateShopping() {
+      const inputs = [...document.querySelectorAll("#shopping-groups input")];
+      const checked = inputs.filter(input => input.checked).map(input => input.value);
+      const remainingOnly = document.querySelector("#remaining-only").checked;
+      store.set("cut-shopping-v2", checked);
+      document.querySelector("#shopping-count").textContent = `${checked.length}/${inputs.length}`;
+      document.querySelector("#shopping-progress").style.width = `${inputs.length ? checked.length / inputs.length * 100 : 0}%`;
+      document.querySelector("#shopping-message").textContent = checked.length === inputs.length ? "Hai tutto per la settimana." : checked.length ? `Mancano ${inputs.length - checked.length} prodotti.` : "Inizia dalle proteine.";
+      inputs.forEach(input => input.closest("[data-item]").classList.toggle("filtered", remainingOnly && input.checked));
+      document.querySelectorAll("[data-group]").forEach(group => group.classList.toggle("empty", !group.querySelector("[data-item]:not(.filtered)")));
     }
 
     function renderLog() {
       const entries = store.get("cut-measurements", []).sort((a, b) => b.date.localeCompare(a.date));
-      const rows = entries.length ? entries.map((entry, index) => `<div class="log-row"><span>${new Date(`${entry.date}T12:00:00`).toLocaleDateString("it-IT")}</span><span>${Number(entry.weight).toFixed(1)} kg</span><span>${entry.waist ? `${Number(entry.waist).toFixed(1)} cm` : "—"}</span><button class="delete-log" type="button" data-delete="${index}" title="Elimina misurazione" aria-label="Elimina misurazione"><i data-lucide="trash-2"></i></button></div>`).join("") : `<div class="log-row"><span>Nessun dato</span><span>—</span><span>—</span><span></span></div>`;
+      const rows = entries.length ? entries.map((entry, index) => `<div class="log-row"><span>${new Date(`${entry.date}T12:00:00`).toLocaleDateString("it-IT")}</span><span>${Number(entry.weight).toFixed(1)} kg</span><span>${entry.waist ? `${Number(entry.waist).toFixed(1)} cm` : "—"}</span><button class="delete-log" type="button" data-delete="${index}" aria-label="Elimina misurazione">×</button></div>`).join("") : `<div class="log-row"><span>Nessun dato</span><span>—</span><span>—</span><span></span></div>`;
       document.querySelector("#measurement-log").innerHTML = `<div class="log-row head"><span>Data</span><span>Peso</span><span>Vita</span><span></span></div>${rows}`;
-      if (window.lucide) lucide.createIcons();
     }
 
-    document.querySelectorAll(".tab").forEach(button => button.addEventListener("click", () => setTab(button.dataset.tab)));
-    document.querySelector("#print").addEventListener("click", () => window.print());
-    document.querySelectorAll(".segment").forEach(button => button.addEventListener("click", () => {
-      activeList = button.dataset.list;
-      document.querySelectorAll(".segment").forEach(item => item.setAttribute("aria-pressed", item === button));
-      renderShopping();
-    }));
-    document.querySelector("#shopping-groups").addEventListener("change", event => {
-      if (!event.target.matches("input[type=checkbox]")) return;
-      const checked = [...document.querySelectorAll("#shopping-groups input:checked")].map(input => input.dataset.item);
-      store.set(`cut-shopping-${activeList}`, checked);
+    document.addEventListener("click", event => {
+      const navigation = event.target.closest("[data-panel], [data-go]");
+      if (navigation) {
+        event.preventDefault();
+        setPanel(navigation.dataset.panel || navigation.dataset.go);
+      }
+
+      const dayButton = event.target.closest("[data-day]");
+      if (dayButton) {
+        selectedDay = Number(dayButton.dataset.day);
+        renderSelectedDay();
+        dayButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      }
+
+      const openDay = event.target.closest("[data-open-day]");
+      if (openDay) {
+        selectedDay = Number(openDay.dataset.openDay);
+        renderDayPicker();
+        renderSelectedDay();
+        setPanel("oggi");
+      }
+    });
+
+    document.querySelector("#shopping-groups").addEventListener("change", updateShopping);
+    document.querySelector("#remaining-only").addEventListener("change", updateShopping);
+    document.querySelector("#reset-shopping").addEventListener("click", () => {
+      if (!confirm("Vuoi togliere tutte le spunte?")) return;
+      document.querySelectorAll("#shopping-groups input").forEach(input => input.checked = false);
+      updateShopping();
+    });
+
+    document.querySelector("#adjust-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const previous = Number(document.querySelector("#previous-average").value);
+      const current = Number(document.querySelector("#current-average").value);
+      const performance = document.querySelector("#performance").value;
+      const loss = previous - current;
+      const box = document.querySelector("#recommendation");
+      let title = "Continua uguale";
+      let message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg: il ritmo va bene. Mantieni calorie e allenamento per un'altra settimana.`;
+      let tone = "good";
+
+      if (performance === "down") {
+        title = "Proteggi forza e recupero";
+        message = "La forza cala da due settimane: aggiungi 100–150 kcal e controlla sonno, stress e volume di allenamento.";
+        tone = "alert";
+      } else if (loss > .7) {
+        title = "Stai scendendo troppo in fretta";
+        message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Aggiungi 100–150 kcal al giorno e ricontrolla la prossima media.`;
+        tone = "alert";
+      } else if (loss > .53) {
+        title = "Ritmo un po' alto";
+        message = "Se fame, sonno e forza sono buoni, osserva ancora una settimana; altrimenti aggiungi circa 100 kcal.";
+        tone = "watch";
+      } else if (loss <= 0) {
+        title = "Non tagliare subito";
+        message = "Controlla aderenza e girovita per 2–3 settimane. Solo dopo riduci 100–150 kcal oppure aumenta i passi.";
+        tone = "watch";
+      } else if (loss < .25) {
+        title = "Calo ancora piccolo";
+        message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Conferma il trend per 2–3 settimane prima di cambiare calorie.`;
+        tone = "watch";
+      }
+
+      box.dataset.tone = tone;
+      box.innerHTML = `<strong>${title}</strong><p>${message}</p>`;
     });
 
     document.querySelector("#log-form").addEventListener("submit", event => {
@@ -577,48 +787,22 @@
       renderLog();
     });
 
-    document.querySelector("#adjust-form").addEventListener("submit", event => {
-      event.preventDefault();
-      const previous = Number(document.querySelector("#previous-average").value);
-      const current = Number(document.querySelector("#current-average").value);
-      const performance = document.querySelector("#performance").value;
-      const loss = previous - current;
-      const box = document.querySelector("#recommendation");
-      let title = "Mantieni le calorie";
-      let message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Il ritmo è nel target: continua per un’altra settimana.`;
-      let tone = "good";
-      if (performance === "down") {
-        title = "Recupero insufficiente";
-        message = "Con prestazioni in calo da due settimane, aggiungi 100–150 kcal e controlla sonno, volume di allenamento e stress.";
-        tone = "alert";
-      } else if (loss > 0.7) {
-        title = "Deficit troppo rapido";
-        message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Aggiungi 100–150 kcal al giorno e rivaluta la prossima media settimanale.`;
-        tone = "alert";
-      } else if (loss > 0.53) {
-        title = "Ritmo alto: osserva ancora";
-        message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Se fame, sonno e forza restano buoni puoi mantenere; altrimenti aggiungi circa 100 kcal.`;
-        tone = "watch";
-      } else if (loss <= 0) {
-        title = "Peso stabile o in aumento";
-        message = `La media è salita di ${Math.abs(loss).toFixed(2).replace(".", ",")} kg. Verifica aderenza e girovita per 2–3 settimane; poi riduci 100–150 kcal oppure aumenta i passi.`;
-        tone = "watch";
-      } else if (loss < 0.25) {
-        title = "Calo insufficiente";
-        message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Conferma il dato per 2–3 settimane; poi riduci 100–150 kcal oppure aumenta i passi.`;
-        tone = "watch";
-      }
-      box.dataset.tone = tone;
-      box.innerHTML = `<strong>${title}</strong><p>${message}</p>`;
-    });
+    function selfCheck() {
+      const daily = schedule.map(totals);
+      console.assert(schedule.length === 7, "Menu incompleto");
+      console.assert(daily.every(total => total.kcal >= 1650 && total.kcal <= 1800), "Calorie fuori intervallo");
+      console.assert(daily.every(total => total.protein >= 140), "Proteine insufficienti");
+      console.assert(new Set(shopping.flatMap(group => group.items.map(item => item.id))).size === 21, "Lista spesa non valida");
+    }
 
-    renderToday();
+    renderDayPicker();
+    renderSelectedDay();
     renderWeek();
     renderShopping();
     renderLog();
     document.querySelector("#log-date").value = localDate();
-    setTab(location.hash.slice(1) || "piano");
-    if (window.lucide) lucide.createIcons();
+    setPanel(location.hash.slice(1) || "oggi", false);
+    selfCheck();
   </script>
 </body>
 </html>
