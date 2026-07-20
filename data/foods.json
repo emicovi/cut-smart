@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "note": "Valori medi per 100 g di parte edibile, salvo servingGrams. Per i prodotti confezionati prevale sempre l'etichetta acquistata.",
+  "sources": {
+    "CREA": "https://www.alimentinutrizione.it/tabelle-nutrizionali/ricerca-per-alimento",
+    "USDA": "https://fdc.nal.usda.gov/",
+    "LABEL": "Valore medio di etichette comuni; da personalizzare quando cambia prodotto"
+  },
+  "foods": {
+    "greek_yogurt_0": { "name": "Yogurt greco 0%", "state": "come venduto", "kcal": 59, "protein": 10.3, "carbs": 3.6, "fat": 0.4, "source": "LABEL" },
+    "oats": { "name": "Avena", "state": "secca", "kcal": 389, "protein": 16.9, "carbs": 66.3, "fat": 6.9, "source": "USDA" },
+    "banana": { "name": "Banana media", "state": "parte edibile", "servingGrams": 120, "kcal": 89, "protein": 1.1, "carbs": 22.8, "fat": 0.3, "source": "CREA" },
+    "apple": { "name": "Mela media", "state": "parte edibile", "servingGrams": 180, "kcal": 52, "protein": 0.3, "carbs": 13.8, "fat": 0.2, "source": "CREA" },
+    "cottage": { "name": "Fiocchi di latte magri", "state": "come venduti", "kcal": 75, "protein": 12, "carbs": 3, "fat": 1.8, "source": "LABEL" },
+    "dark_chocolate": { "name": "Cioccolato fondente 70–85%", "state": "come venduto", "kcal": 598, "protein": 7.8, "carbs": 45.9, "fat": 42.6, "source": "USDA" },
+    "egg": { "name": "Uovo medio", "state": "senza guscio", "servingGrams": 50, "kcal": 143, "protein": 12.6, "carbs": 0.7, "fat": 9.5, "source": "CREA" },
+    "egg_white": { "name": "Albume", "state": "crudo", "kcal": 46, "protein": 10.9, "carbs": 0.7, "fat": 0.2, "source": "CREA" },
+    "pasta": { "name": "Pasta di semola", "state": "peso secco", "kcal": 353, "protein": 13, "carbs": 72.7, "fat": 1.5, "source": "CREA" },
+    "tuna": { "name": "Tonno al naturale", "state": "sgocciolato", "kcal": 116, "protein": 26, "carbs": 0, "fat": 1, "source": "LABEL" },
+    "passata": { "name": "Passata di pomodoro", "state": "come venduta", "kcal": 30, "protein": 1.5, "carbs": 5, "fat": 0.2, "source": "LABEL" },
+    "olive_oil": { "name": "Olio extravergine di oliva", "state": "peso netto", "kcal": 900, "protein": 0, "carbs": 0, "fat": 100, "source": "CREA" },
+    "rice": { "name": "Riso", "state": "peso secco", "kcal": 360, "protein": 7.5, "carbs": 79, "fat": 0.7, "source": "CREA" },
+    "chicken": { "name": "Petto di pollo", "state": "peso crudo", "kcal": 110, "protein": 23, "carbs": 0, "fat": 1.5, "source": "CREA" },
+    "vegetables": { "name": "Verdure miste", "state": "peso surgelato/crudo", "kcal": 35, "protein": 2, "carbs": 5.5, "fat": 0.4, "source": "CREA" },
+    "potatoes": { "name": "Patate", "state": "peso crudo", "kcal": 77, "protein": 2, "carbs": 17.5, "fat": 0.1, "source": "CREA" },
+    "cod": { "name": "Merluzzo", "state": "peso crudo/scongelato", "kcal": 82, "protein": 18, "carbs": 0, "fat": 0.7, "source": "CREA" },
+    "bread": { "name": "Pane comune", "state": "come venduto", "kcal": 250, "protein": 8.5, "carbs": 49, "fat": 2.5, "source": "CREA" },
+    "salad": { "name": "Insalata", "state": "parte edibile", "servingGrams": 100, "kcal": 20, "protein": 1, "carbs": 3, "fat": 0.2, "source": "CREA" }
+  }
+}

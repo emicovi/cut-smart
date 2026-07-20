@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#176b43">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
   <title>Cut Smart</title>
   <style>
     :root {
@@ -51,7 +56,7 @@
     .brand-mark { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 11px; color: #fff; background: var(--green); font-size: .76rem; font-weight: 950; }
     .brand strong { display: block; font-size: .95rem; }
     .brand small { display: block; margin-top: 1px; color: var(--muted); font-size: .66rem; }
-    .goal-chip { padding: 7px 9px; border-radius: 10px; color: var(--green-dark); background: var(--green-soft); font-size: .7rem; font-weight: 900; }
+    .install-button { min-height: 36px; padding: 7px 10px; border: 1px solid #b9d7c2; border-radius: 10px; color: var(--green-dark); background: var(--green-soft); font-size: .7rem; font-weight: 900; }
 
     .app-nav {
       position: fixed;
@@ -127,9 +132,16 @@
     .today-total { text-align: right; }
     .today-total strong { display: block; font-size: 1.05rem; }
     .today-total span { display: block; margin-top: 2px; color: var(--green-dark); font-size: .72rem; font-weight: 850; }
+    .daily-progress { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr; gap: 9px; align-items: center; padding-top: 10px; border-top: 1px solid rgba(23, 107, 67, .16); }
+    .daily-progress strong { color: var(--green-dark); font-size: .7rem; }
+    .daily-progress-track { height: 7px; overflow: hidden; border-radius: 999px; background: rgba(23, 107, 67, .13); }
+    .daily-progress-bar { width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .2s ease; }
 
     .meal-list { display: grid; gap: 10px; margin-top: 11px; }
     .meal-card { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: 0 4px 15px rgba(16, 34, 25, .035); }
+    .meal-card.done { border-color: #a9cfb5; background: #fbfefc; }
+    .meal-card.done h2 { color: var(--green); }
+    .meal-card.done .meal-emoji { background: var(--green-soft); }
     .meal-main { padding: 15px; }
     .meal-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .meal-slot { display: flex; align-items: center; gap: 9px; min-width: 0; }
@@ -147,7 +159,10 @@
     }
     .meal-slot > div span { display: block; color: var(--muted); font-size: .67rem; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
     .meal-slot > div strong { display: block; margin-top: 2px; font-size: .76rem; }
-    .time { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; color: var(--green-dark); background: var(--green-soft); font-size: .7rem; font-weight: 900; }
+    .meal-actions { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; }
+    .time { padding: 5px 8px; border-radius: 999px; color: var(--green-dark); background: var(--green-soft); font-size: .7rem; font-weight: 900; }
+    .done-button { min-height: 32px; padding: 5px 8px; border: 1px solid #b7d6c0; border-radius: 10px; color: var(--green); background: #fff; font-size: .68rem; font-weight: 900; }
+    .done-button[aria-pressed="true"] { border-color: var(--green); color: #fff; background: var(--green); }
     .meal-card h2 { margin: 12px 0 9px; font-size: 1.12rem; letter-spacing: -.025em; }
     .ingredients { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
     .ingredients li { padding: 6px 8px; border-radius: 9px; color: #445149; background: #f2f5f2; font-size: .77rem; }
@@ -159,10 +174,23 @@
     .recipe summary::after { content: "+"; font-size: 1.15rem; }
     .recipe[open] summary::after { content: "−"; }
     .recipe p { margin: 0; padding: 0 15px 14px; color: #59463b; font-size: .82rem; line-height: 1.5; }
+    .swap { border-top: 1px solid #edf0ed; background: #f9fcfa; }
+    .swap summary { min-height: 43px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 15px; color: var(--green); cursor: pointer; list-style: none; font-size: .75rem; font-weight: 900; }
+    .swap summary::-webkit-details-marker { display: none; }
+    .swap summary::after { content: "+"; font-size: 1rem; }
+    .swap[open] summary::after { content: "−"; }
+    .swap p { margin: 0; padding: 0 15px 13px; color: #435047; font-size: .77rem; line-height: 1.45; }
 
     .prep-alert { margin-top: 11px; padding: 13px; border: 1px solid #ead888; border-radius: 15px; background: var(--yellow-soft); }
     .prep-alert strong { display: block; font-size: .82rem; }
     .prep-alert p { margin: 4px 0 0; color: #63582f; font-size: .77rem; line-height: 1.45; }
+    .habit-card { margin-top: 11px; padding: 13px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .habit-card h2 { margin: 0; font-size: .88rem; }
+    .habit-card p { margin: 3px 0 9px; color: var(--muted); font-size: .69rem; }
+    .habit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; }
+    .habit { min-height: 43px; display: flex; align-items: center; gap: 7px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 11px; color: #405048; background: #f8faf8; font-size: .7rem; font-weight: 800; }
+    .habit input { width: 17px; height: 17px; margin: 0; accent-color: var(--green); }
+    .habit:has(input:checked) { border-color: #afd1ba; color: var(--green-dark); background: var(--green-soft); }
 
     .rule-bar { margin-top: 11px; padding: 11px 13px; border-radius: 14px; color: #425047; background: #e9eeea; font-size: .75rem; line-height: 1.45; }
     .rule-bar strong { color: var(--ink); }
@@ -190,24 +218,29 @@
     .summary-box { min-width: 0; padding: 11px 6px; border: 1px solid var(--line); border-radius: 13px; text-align: center; background: #fff; }
     .summary-box strong { display: block; font-size: .92rem; }
     .summary-box span { display: block; margin-top: 2px; color: var(--muted); font-size: .64rem; }
+    .flex-card { margin-bottom: 13px; padding: 14px; border: 1px solid #ead888; border-radius: 15px; background: var(--yellow-soft); }
+    .flex-card h2 { margin: 0; font-size: .95rem; }
+    .flex-card p { margin: 5px 0 0; color: #63552d; font-size: .76rem; line-height: 1.45; }
+    .flex-card ul { display: grid; gap: 5px; margin: 9px 0 0; padding-left: 18px; color: #514a31; font-size: .74rem; line-height: 1.4; }
+    .free-toggle { min-height: 44px; display: flex; align-items: center; gap: 9px; margin-top: 10px; padding: 9px 10px; border: 1px solid #e3c765; border-radius: 12px; color: #4f4629; background: rgba(255, 255, 255, .55); font-size: .75rem; font-weight: 850; }
+    .free-toggle input { width: 19px; height: 19px; margin: 0; accent-color: var(--green); }
 
     .week-list { display: grid; gap: 8px; }
     .week-day { overflow: hidden; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
-    .week-day[open] { border-color: #b9d7c2; box-shadow: var(--shadow); }
-    .week-day summary { min-height: 68px; display: grid; grid-template-columns: 47px 1fr auto; gap: 9px; align-items: center; padding: 10px 12px; cursor: pointer; list-style: none; }
-    .week-day summary::-webkit-details-marker { display: none; }
+    .week-day.today { border-color: #a9cfb5; box-shadow: var(--shadow); }
+    .week-head { min-height: 62px; display: grid; grid-template-columns: 47px 1fr auto; gap: 9px; align-items: center; padding: 9px 12px; }
     .week-date { display: grid; place-items: center; align-content: center; width: 45px; height: 45px; border-radius: 13px; color: var(--green); background: var(--green-soft); }
     .week-date span { font-size: .61rem; font-weight: 900; text-transform: uppercase; }
     .week-date strong { font-size: .91rem; }
     .week-copy { min-width: 0; }
     .week-copy strong { display: block; font-size: .86rem; }
-    .week-copy span { display: block; margin-top: 3px; overflow: hidden; color: var(--muted); font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+    .week-copy span { display: block; margin-top: 3px; color: var(--muted); font-size: .68rem; }
     .week-total { text-align: right; font-size: .7rem; font-weight: 900; }
     .week-total span { display: block; margin-top: 2px; color: var(--muted); font-size: .62rem; font-weight: 700; }
-    .week-detail { padding: 0 12px 12px; border-top: 1px solid #edf0ed; }
-    .week-meal { display: grid; grid-template-columns: 72px 1fr; gap: 7px; padding: 8px 0; border-bottom: 1px solid #edf0ed; font-size: .76rem; }
+    .week-core { padding: 2px 12px 11px; border-top: 1px solid #edf0ed; }
+    .week-meal { display: grid; grid-template-columns: 52px 1fr; gap: 7px; padding: 8px 0; border-bottom: 1px solid #edf0ed; font-size: .76rem; }
     .week-meal span { color: var(--muted); font-weight: 800; }
-    .week-detail .button { width: 100%; margin-top: 10px; }
+    .week-core .button { width: 100%; margin-top: 9px; }
 
     .section { margin-top: 22px; }
     .section-title { margin-bottom: 10px; }
@@ -274,6 +307,25 @@
     .log-row.head { min-height: 32px; color: var(--muted); font-size: .61rem; font-weight: 900; text-transform: uppercase; }
     .delete-log { width: 30px; height: 30px; border: 0; border-radius: 8px; color: var(--red); background: transparent; font-size: 1rem; }
     .reality-note { margin-top: 10px; padding: 12px; border-left: 3px solid var(--orange); border-radius: 0 12px 12px 0; color: #614539; background: var(--orange-soft); font-size: .74rem; line-height: 1.45; }
+    .history-card { margin-top: 10px; }
+    .history-summary { margin: 5px 0 10px; color: var(--muted); font-size: .72rem; line-height: 1.45; }
+    .history-list { display: grid; gap: 7px; }
+    .history-day { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: #fafcfa; }
+    .history-day summary { min-height: 48px; display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; padding: 8px 10px; cursor: pointer; list-style: none; }
+    .history-day summary::-webkit-details-marker { display: none; }
+    .history-day strong { display: block; font-size: .76rem; }
+    .history-day summary span { display: block; margin-top: 2px; color: var(--muted); font-size: .65rem; }
+    .history-score { text-align: right; color: var(--green-dark); font-size: .68rem; font-weight: 900; }
+    .history-detail { padding: 8px 10px 10px; border-top: 1px solid var(--line); }
+    .history-detail p { margin: 0; color: #405048; font-size: .7rem; line-height: 1.5; }
+    .history-detail p + p { margin-top: 4px; }
+    .backup-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 10px; }
+    .backup-note { margin: 8px 0 0; color: var(--muted); font-size: .65rem; line-height: 1.4; }
+    .nutrition-settings { margin-top: 10px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .nutrition-settings summary { padding: 13px 14px; cursor: pointer; font-size: .8rem; font-weight: 900; }
+    .nutrition-settings-content { padding: 0 14px 14px; }
+    .nutrition-settings-content p { margin: 0 0 10px; color: var(--muted); font-size: .72rem; line-height: 1.45; }
+    .editor-actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
 
     @media (min-width: 700px) {
       .shell { width: min(100% - 44px, 1060px); }
@@ -294,7 +346,7 @@
       .app-nav { position: static; min-height: auto; display: flex; gap: 4px; margin-left: auto; padding: 0; border: 0; background: transparent; box-shadow: none; }
       .nav-button { min-height: 40px; display: flex; gap: 6px; padding: 7px 11px; font-size: .75rem; }
       .nav-button svg { width: 18px; height: 18px; }
-      .goal-chip { margin-left: 4px; }
+      .install-button { margin-left: 4px; }
       main { padding-bottom: 0; }
       .week-list, .shopping-groups { grid-template-columns: repeat(3, 1fr); }
     }
@@ -332,7 +384,7 @@
         </button>
       </nav>
 
-      <span class="goal-chip">1.700–1.750 kcal</span>
+      <button class="install-button" id="install-button" type="button" hidden>Installa app</button>
     </div>
   </header>
 
@@ -344,10 +396,22 @@
         <header class="today-summary" aria-live="polite">
           <div><small id="today-context">Oggi mangi</small><h1 id="today-title">Lunedì</h1></div>
           <div class="today-total"><strong id="today-kcal">1.685 kcal</strong><span id="today-protein">147 g proteine</span></div>
+          <div class="daily-progress"><strong id="daily-progress-label">0/4 pasti completati</strong><div class="daily-progress-track" aria-hidden="true"><div class="daily-progress-bar" id="daily-progress-bar"></div></div></div>
         </header>
 
         <div class="meal-list" id="meal-list"></div>
         <div id="prep-alert"></div>
+
+        <section class="habit-card">
+          <h2>Oltre al menu</h2>
+          <p>Le quattro cose che aiutano a perdere grasso senza sacrificare muscolo.</p>
+          <div class="habit-grid" id="habit-grid">
+            <label class="habit"><input type="checkbox" value="steps"> 8.000+ passi</label>
+            <label class="habit"><input type="checkbox" value="creatine"> Creatina 3–5 g</label>
+            <label class="habit"><input type="checkbox" value="training"> Pesi, se previsti</label>
+            <label class="habit"><input type="checkbox" value="sleep"> Sonno 7,5+ ore</label>
+          </div>
+        </section>
 
         <div class="quick-actions">
           <button class="button" type="button" data-go="spesa">Lista della spesa</button>
@@ -361,15 +425,26 @@
     <section class="panel" id="settimana" aria-labelledby="week-title" hidden>
       <div class="shell">
         <header class="panel-head">
-          <h1 id="week-title">Cosa mangio questa settimana?</h1>
-          <p>Apri un giorno e vedi subito i quattro pasti. Tocca “Apri ricette” per tornare alle istruzioni complete.</p>
+          <h1 id="week-title">Pranzi e cene della settimana</h1>
+          <p>Colazione e spuntino restano quelli mostrati in “Oggi”. Qui vedi solo le decisioni che cambiano davvero.</p>
         </header>
 
         <div class="summary-grid">
-          <div class="summary-box"><strong>≈ 1.731</strong><span>kcal medie</span></div>
-          <div class="summary-box"><strong>≈ 151 g</strong><span>proteine medie</span></div>
-          <div class="summary-box"><strong>2 volte</strong><span>meal prep</span></div>
+          <div class="summary-box"><strong id="week-average-kcal">≈ 1.850</strong><span>kcal medie</span></div>
+          <div class="summary-box"><strong id="week-average-protein">≈ 156 g</strong><span>proteine medie</span></div>
+          <div class="summary-box"><strong id="week-free-count">1 pizza</strong><span>già inclusa</span></div>
         </div>
+
+        <aside class="flex-card">
+          <h2>🍕 Uscite senza rovinare il cut</h2>
+          <p>La pizza del sabato è già dentro la media settimanale. Non serve saltare pasti prima o digiunare il giorno dopo.</p>
+          <ul>
+            <li><strong>Prima uscita:</strong> pizza completa, preferibilmente margherita, diavola o bresaola e rucola.</li>
+            <li><strong>Seconda uscita opzionale:</strong> dopo 2 settimane, se perdi almeno 350 g/settimana e la forza resta stabile, sostituisci una cena con hamburger singolo, poke proteica, sushi semplice o tagliata con patate.</li>
+            <li>Per dimagrire più rapidamente scegli un piatto principale; antipasto, dolce o alcol: al massimo uno dei tre.</li>
+          </ul>
+          <label class="free-toggle"><input id="second-free-meal" type="checkbox"> Questa settimana faccio anche la seconda uscita</label>
+        </aside>
 
         <div class="week-list" id="week-list"></div>
 
@@ -379,16 +454,16 @@
             <article class="prep-card">
               <header><h3>Domenica</h3><span>25 minuti</span></header>
               <ol>
-                <li>Cuoci <strong>340 g di pollo</strong> con paprika, aglio e limone.</li>
-                <li>Prepara <strong>60 g di riso</strong> e <strong>500 g di patate</strong>.</li>
+                <li>Cuoci <strong>320 g di pollo</strong> con paprika, aglio e limone.</li>
+                <li>Prepara <strong>60 g di riso</strong> e <strong>450 g di patate</strong>.</li>
                 <li>Dividi per i pasti di martedì e mercoledì.</li>
               </ol>
             </article>
             <article class="prep-card">
               <header><h3>Mercoledì</h3><span>30 minuti</span></header>
               <ol>
-                <li>Cuoci <strong>510 g di pollo</strong>: metà curry, metà paprika.</li>
-                <li>Prepara <strong>120 g di riso</strong> e <strong>750 g di patate</strong>.</li>
+                <li>Cuoci <strong>490 g di pollo</strong>: metà curry, metà paprika.</li>
+                <li>Prepara <strong>120 g di riso</strong> e <strong>700 g di patate</strong>.</li>
                 <li>Dividi per giovedì–domenica e congela le porzioni di domenica.</li>
               </ol>
             </article>
@@ -408,7 +483,7 @@
         <section class="shopping-progress" aria-label="Avanzamento spesa">
           <div class="progress-head">
             <div><h2>La tua lista</h2><p id="shopping-message">Inizia dalle proteine.</p></div>
-            <div class="progress-count"><strong id="shopping-count">0/21</strong><span>presi</span></div>
+            <div class="progress-count"><strong id="shopping-count">0/22</strong><span>presi</span></div>
           </div>
           <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="shopping-progress"></div></div>
         </section>
@@ -465,6 +540,31 @@
           </article>
         </div>
 
+        <article class="card history-card">
+          <h2>Storico ultimi 14 giorni</h2>
+          <p class="history-summary" id="history-summary">I dati restano privati su questo dispositivo.</p>
+          <div class="history-list" id="history-list"></div>
+          <div class="backup-actions">
+            <button class="button secondary small" id="export-data" type="button">Scarica backup</button>
+            <button class="button secondary small" id="import-data" type="button">Ripristina backup</button>
+          </div>
+          <input id="import-file" type="file" accept="application/json" hidden>
+          <p class="backup-note">Il backup contiene soltanto i dati Cut Smart salvati nel browser: spesa, pasti, abitudini, misure e preferenze.</p>
+        </article>
+
+        <details class="nutrition-settings">
+          <summary>Rendi i calcoli precisi con le tue etichette</summary>
+          <div class="nutrition-settings-content">
+            <p>L’app usa valori medi CREA/USDA. Per yogurt, tonno, pane, fiocchi di latte e cioccolato puoi salvare i valori reali indicati sulla confezione.</p>
+            <form id="food-label-form" class="form-grid two">
+              <div class="field full"><label for="food-label-select">Prodotto</label><select id="food-label-select"><option value="greek_yogurt_0">Yogurt greco 0%</option><option value="cottage">Fiocchi di latte</option><option value="tuna">Tonno al naturale</option><option value="dark_chocolate">Cioccolato fondente</option><option value="bread">Pane</option></select></div>
+              <div class="field"><label for="food-label-kcal">kcal per 100 g</label><input id="food-label-kcal" type="number" min="1" max="1000" step="1" required></div>
+              <div class="field"><label for="food-label-protein">Proteine per 100 g</label><input id="food-label-protein" type="number" min="0" max="100" step="0.1" required></div>
+              <div class="field full editor-actions"><button class="button secondary" type="submit">Salva etichetta</button><button class="reset" id="reset-food-label" type="button">Ripristina</button></div>
+            </form>
+          </div>
+        </details>
+
         <div class="reality-note"><strong>Una cosa importante:</strong> non puoi scegliere di perdere solo il grasso della pancia. Se girovita e media del peso scendono mentre la forza regge, il piano sta funzionando. Mettere massa durante il cut è possibile, ma mantenere o aumentare la forza è il segnale più realistico da seguire.</div>
       </div>
     </section>
@@ -473,54 +573,89 @@
   <script>
     const meals = {
       breakfast: {
-        emoji: "🥣", name: "Yogurt bowl croccante", time: "2 min", kcal: 420, protein: 37,
-        ingredients: [["300 g", "yogurt greco 0%"], ["40 g", "avena"], ["1", "{fruit}"], ["q.b.", "cannella"]],
+        emoji: "🥣", name: "Yogurt bowl croccante", time: "2 min", kcal: 400, protein: 36,
+        ingredients: [["300 g", "yogurt greco 0%"], ["30 g", "avena"], ["1", "{fruit}"], ["q.b.", "cannella"]],
         taste: "Cannella e scorza di limone.",
-        method: "Mescola yogurt e avena, aggiungi la frutta a pezzi e completa con cannella e scorza di limone."
+        method: "Mescola yogurt e avena, aggiungi la frutta a pezzi e completa con cannella e scorza di limone.",
+        swap: "Senza avena: usa 60 g di pane tostato. Senza yogurt: 200 g di fiocchi di latte e riduci il pane o i cereali del pasto successivo."
       },
       cottage: {
-        emoji: "🍎", name: "Fiocchi di latte dolci", time: "2 min", kcal: 250, protein: 24,
-        ingredients: [["200 g", "fiocchi di latte"], ["1", "{fruit}"], ["q.b.", "cannella"]],
-        taste: "Schiaccia metà frutta dentro: diventa più cremoso.",
-        method: "Taglia la frutta, schiacciane metà nei fiocchi di latte e usa il resto sopra con cannella."
+        emoji: "🍎", name: "Fiocchi di latte e fondente", time: "2 min", kcal: 305, protein: 25,
+        ingredients: [["200 g", "fiocchi di latte"], ["1", "{fruit}"], ["10 g", "cioccolato fondente"], ["q.b.", "cannella"]],
+        taste: "Schiaccia metà frutta dentro e spezza il fondente sopra.",
+        method: "Taglia la frutta, schiacciane metà nei fiocchi di latte e completa con cannella e cioccolato fondente a pezzetti.",
+        swap: "Senza fiocchi di latte: fai 2 uova + 150 g di albume. Tieni il pezzetto di fondente come dolce dopo il pasto."
       },
       eggs: {
-        emoji: "🍳", name: "Uova strapazzate express", time: "6 min", kcal: 310, protein: 29,
-        ingredients: [["2", "uova"], ["150 g", "albume"], ["1", "{fruit}"], ["q.b.", "paprika"]],
-        taste: "Paprika affumicata e pepe nero.",
-        method: "Sbatti uova, albume, paprika e pepe. Versa in padella antiaderente calda e gira per 4–5 minuti. Frutta a parte."
+        emoji: "🍳", name: "Uova express e fondente", time: "6 min", kcal: 365, protein: 30,
+        ingredients: [["2", "uova"], ["150 g", "albume"], ["1", "{fruit}"], ["10 g", "cioccolato fondente"]],
+        taste: "Paprika e pepe sulle uova; fondente dopo come dolce.",
+        method: "Sbatti uova, albume, paprika e pepe. Cuoci 4–5 minuti. Mangia la frutta e il cioccolato fondente a parte.",
+        swap: "Senza uova o albume: usa 200 g di fiocchi di latte con frutta e fondente. È più rapido e resta ricco di proteine."
       },
       pasta: {
         emoji: "🍝", name: "Pasta al tonno piccante", time: "12 min", kcal: 525, protein: 45,
         ingredients: [["80 g", "pasta"], ["140 g", "tonno sgocciolato"], ["150 g", "passata"], ["5 g", "olio EVO"]],
         taste: "Origano, peperoncino e capperi opzionali.",
-        method: "Mentre cuoce la pasta, scalda passata, origano e peperoncino. Spegni, aggiungi il tonno, manteca la pasta e metti l'olio a crudo."
+        method: "Mentre cuoce la pasta, scalda passata, origano e peperoncino. Spegni, aggiungi il tonno, manteca la pasta e metti l'olio a crudo.",
+        swap: "Senza pasta: usa 60 g di riso. Senza tonno: usa 170 g di pollo già cotto; lascia invariati passata e olio."
       },
       rice: {
         emoji: "🍛", name: "Riso e pollo al curry", time: "6 min", kcal: 550, protein: 45,
         ingredients: [["60 g", "riso"], ["170 g", "pollo"], ["250 g", "verdure"], ["5 g", "olio EVO"]],
         taste: "Curry, soia light e una spruzzata di limone.",
-        method: "Scalda pollo e riso già pronti con le verdure, curry e poca salsa di soia. Spegni e aggiungi olio e limone."
+        method: "Scalda pollo e riso già pronti con le verdure, curry e poca salsa di soia. Spegni e aggiungi olio e limone.",
+        swap: "Senza riso: usa 250 g di patate. Senza pollo: usa 220 g di merluzzo e condiscilo con curry e limone."
       },
       chicken: {
-        emoji: "🍗", name: "Pollo e patate croccanti", time: "8 min", kcal: 525, protein: 46,
-        ingredients: [["170 g", "pollo"], ["250 g", "patate"], ["250 g", "verdure"], ["5 g", "olio EVO"]],
+        emoji: "🍗", name: "Pollo e patate croccanti", time: "8 min", kcal: 465, protein: 41,
+        ingredients: [["150 g", "pollo"], ["200 g", "patate"], ["250 g", "verdure"], ["5 g", "olio EVO"]],
         taste: "Paprika affumicata, aglio e limone.",
-        method: "Ripassa pollo e patate già cotti in padella o friggitrice ad aria finché sono croccanti. Aggiungi verdure, olio e limone."
+        method: "Ripassa pollo e patate già cotti in padella o friggitrice ad aria finché sono croccanti. Aggiungi verdure, olio e limone.",
+        swap: "Senza pollo: usa 220 g di merluzzo. Senza patate: usa 60 g di riso; tieni uguali verdure e olio."
       },
       cod: {
         emoji: "🐟", name: "Merluzzo aglio e limone", time: "12 min", kcal: 520, protein: 46,
         ingredients: [["220 g", "merluzzo"], ["250 g", "patate"], ["250 g", "verdure"], ["5 g", "olio EVO"]],
         taste: "Limone, aglio, prezzemolo e pepe.",
-        method: "Metti il merluzzo in padella con aglio, limone e due cucchiai d'acqua. Copri 8–10 minuti; servi con patate e verdure calde, olio a crudo."
+        method: "Metti il merluzzo in padella con aglio, limone e due cucchiai d'acqua. Copri 8–10 minuti; servi con patate e verdure calde, olio a crudo.",
+        swap: "Senza merluzzo: usa 170 g di pollo. Senza patate: usa 60 g di riso; il resto del piatto non cambia."
       },
       omelette: {
         emoji: "🥚", name: "Frittata morbida e pane", time: "8 min", kcal: 490, protein: 41,
-        ingredients: [["2", "uova"], ["200 g", "albume"], ["80 g", "pane"], ["1 porzione", "insalata"]],
+        ingredients: [["2", "uova"], ["200 g", "albume"], ["80 g", "pane"], ["1 porzione", "insalata"], ["5 g", "olio EVO"]],
         taste: "Paprika, origano e insalata al limone.",
-        method: "Sbatti uova, albume, paprika e origano. Cuoci coperto in padella antiaderente per 6–7 minuti; accompagna con pane tostato e insalata."
+        method: "Sbatti uova, albume, paprika e origano. Cuoci coperto in padella antiaderente per 6–7 minuti; accompagna con pane tostato e insalata.",
+        swap: "Senza uova: usa 170 g di pollo con gli stessi 80 g di pane e insalata. Senza pane: usa 250 g di patate."
+      },
+      pizza: {
+        emoji: "🍕", name: "Pizza fuori", time: "libera", kcal: 850, protein: 30,
+        ingredients: [["1", "pizza"], ["1", "acqua o bibita zero"]],
+        taste: "Margherita, diavola oppure bresaola e rucola: scegli quella che ti soddisfa davvero.",
+        method: "Goditela senza pesare nulla. Mangia normalmente colazione, spuntino e pranzo; non arrivare affamato e non compensare il giorno dopo.",
+        swap: "Alternativa fuori: hamburger singolo completo senza doppio contorno, oppure un primo abbondante. Se aggiungi il dolce, evita antipasto e alcol."
+      },
+      free2: {
+        emoji: "🍔", name: "Seconda uscita proteica", time: "libera", kcal: 700, protein: 40,
+        ingredients: [["1", "piatto principale"], ["1", "acqua o bibita zero"]],
+        taste: "Hamburger singolo, poke con doppia proteina, sushi semplice o tagliata con patate.",
+        method: "Sostituisce la cena del venerdì. Scegli un piatto con una vera fonte proteica e un solo accompagnamento; niente compensazioni il giorno dopo.",
+        swap: "Se vuoi una seconda pizza, va bene occasionalmente: controlla però che la media settimanale continui a scendere almeno 350 g e che la forza resti stabile."
       }
     };
+
+    const mealComponents = {
+      breakfast: [{ food: "greek_yogurt_0", grams: 300 }, { food: "oats", grams: 30 }, { food: "fruit" }],
+      cottage: [{ food: "cottage", grams: 200 }, { food: "fruit" }, { food: "dark_chocolate", grams: 10 }],
+      eggs: [{ food: "egg", servings: 2 }, { food: "egg_white", grams: 150 }, { food: "fruit" }, { food: "dark_chocolate", grams: 10 }],
+      pasta: [{ food: "pasta", grams: 80 }, { food: "tuna", grams: 140 }, { food: "passata", grams: 150 }, { food: "olive_oil", grams: 5 }],
+      rice: [{ food: "rice", grams: 60 }, { food: "chicken", grams: 170 }, { food: "vegetables", grams: 250 }, { food: "olive_oil", grams: 5 }],
+      chicken: [{ food: "chicken", grams: 150 }, { food: "potatoes", grams: 200 }, { food: "vegetables", grams: 250 }, { food: "olive_oil", grams: 5 }],
+      cod: [{ food: "cod", grams: 220 }, { food: "potatoes", grams: 250 }, { food: "vegetables", grams: 250 }, { food: "olive_oil", grams: 5 }],
+      omelette: [{ food: "egg", servings: 2 }, { food: "egg_white", grams: 200 }, { food: "bread", grams: 80 }, { food: "salad", servings: 1 }, { food: "olive_oil", grams: 5 }]
+    };
+
+    let foodDatabase = {};
 
     const schedule = [
       { day: "Lunedì", short: "Lun", snack: "cottage", lunch: "pasta", dinner: "omelette" },
@@ -528,13 +663,13 @@
       { day: "Mercoledì", short: "Mer", snack: "eggs", lunch: "chicken", dinner: "pasta" },
       { day: "Giovedì", short: "Gio", snack: "cottage", lunch: "omelette", dinner: "cod" },
       { day: "Venerdì", short: "Ven", snack: "cottage", lunch: "rice", dinner: "pasta" },
-      { day: "Sabato", short: "Sab", snack: "eggs", lunch: "chicken", dinner: "omelette" },
+      { day: "Sabato", short: "Sab", snack: "eggs", lunch: "chicken", dinner: "pizza" },
       { day: "Domenica", short: "Dom", snack: "cottage", lunch: "rice", dinner: "cod" }
     ];
 
     const shopping = [
       { group: "Proteine", icon: "🥩", items: [
-        { id: "chicken", amount: "1 kg", name: "Pollo o tacchino", note: "ne userai 850 g" },
+        { id: "chicken", amount: "1 kg", name: "Pollo o tacchino", note: "ne userai circa 810 g" },
         { id: "tuna", amount: "6 scatolette", name: "Tonno al naturale", note: "circa 420 g sgocciolato" },
         { id: "cod", amount: "1 busta da 750 g", name: "Merluzzo surgelato", note: "ne userai circa 660 g" }
       ]},
@@ -547,9 +682,9 @@
       { group: "Carboidrati", icon: "🍚", items: [
         { id: "pasta", amount: "1 pacco", name: "Pasta", note: "ne userai 240 g" },
         { id: "rice", amount: "1 pacco", name: "Riso", note: "ne userai 180 g" },
-        { id: "potatoes", amount: "1,5 kg", name: "Patate", note: "ne userai 1,25 kg" },
-        { id: "oats", amount: "1 pacco", name: "Avena", note: "ne userai 280 g" },
-        { id: "bread", amount: "1 confezione", name: "Pane", note: "almeno 240 g" }
+        { id: "potatoes", amount: "1,5 kg", name: "Patate", note: "ne userai circa 1,15 kg" },
+        { id: "oats", amount: "1 pacco", name: "Avena", note: "ne userai 210 g" },
+        { id: "bread", amount: "1 confezione", name: "Pane", note: "almeno 160 g" }
       ]},
       { group: "Frutta e verdura", icon: "🥦", items: [
         { id: "bananas", amount: "7", name: "Banane" },
@@ -562,6 +697,7 @@
         { id: "passata", amount: "1 bottiglia", name: "Passata di pomodoro", note: "almeno 500 g" },
         { id: "oil", amount: "1 bottiglia", name: "Olio EVO" },
         { id: "soy", amount: "1 bottiglietta", name: "Salsa di soia light" },
+        { id: "chocolate", amount: "1 tavoletta", name: "Cioccolato fondente 70–85%", note: "ne userai circa 70 g" },
         { id: "spices", amount: "Controlla", name: "Paprika, curry, origano, aglio e cannella" }
       ]}
     ];
@@ -579,16 +715,42 @@
       date.setDate(date.getDate() + index - todayIndex());
       return date;
     };
-    const localDate = () => {
-      const date = new Date();
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-    };
-    const dayMeals = day => ["breakfast", day.snack, day.lunch, day.dinner];
-    const totals = day => dayMeals(day).reduce((sum, key) => ({ kcal: sum.kcal + meals[key].kcal, protein: sum.protein + meals[key].protein }), { kcal: 0, protein: 0 });
+    const dateKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const localDate = () => dateKey(new Date());
+    const completedKey = dayIndex => `cut-meals-${dateKey(weekDate(dayIndex))}`;
+    const habitsKey = dayIndex => `cut-habits-${dateKey(weekDate(dayIndex))}`;
+    const secondFreeEnabled = () => store.get("cut-second-free-meal", false);
+    const dayMeals = (day, dayIndex) => ["breakfast", day.snack, day.lunch, secondFreeEnabled() && dayIndex === 4 ? "free2" : day.dinner];
     const fruitFor = (dayIndex, breakfast) => {
       const first = dayIndex % 2 === 0 ? "banana" : "mela";
       return breakfast ? first : first === "banana" ? "mela" : "banana";
     };
+    const foodIdForFruit = fruit => fruit === "banana" ? "banana" : "apple";
+
+    function nutritionFor(mealKey, dayIndex) {
+      const meal = meals[mealKey];
+      const components = mealComponents[mealKey];
+      if (!components || !Object.keys(foodDatabase).length) return { kcal: meal.kcal, protein: meal.protein, carbs: 0, fat: 0 };
+      const overrides = store.get("cut-food-overrides", {});
+      return components.reduce((total, component) => {
+        const foodId = component.food === "fruit" ? foodIdForFruit(fruitFor(dayIndex, mealKey === "breakfast")) : component.food;
+        const base = foodDatabase[foodId];
+        if (!base) return total;
+        const food = { ...base, ...(overrides[foodId] || {}) };
+        const grams = component.grams || (component.servings || 1) * food.servingGrams;
+        const factor = grams / 100;
+        total.kcal += food.kcal * factor;
+        total.protein += food.protein * factor;
+        total.carbs += food.carbs * factor;
+        total.fat += food.fat * factor;
+        return total;
+      }, { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+    }
+
+    const totals = (day, dayIndex) => dayMeals(day, dayIndex).reduce((sum, key) => {
+      const nutrition = nutritionFor(key, dayIndex);
+      return { kcal: sum.kcal + nutrition.kcal, protein: sum.protein + nutrition.protein, carbs: sum.carbs + nutrition.carbs, fat: sum.fat + nutrition.fat };
+    }, { kcal: 0, protein: 0, carbs: 0, fat: 0 });
 
     let selectedDay = todayIndex();
 
@@ -614,33 +776,41 @@
       const slots = ["Colazione", "Spuntino", "Pranzo", "Cena"];
       const fruit = fruitFor(dayIndex, key === "breakfast");
       const ingredients = meal.ingredients.map(([amount, name]) => `<li><b>${amount}</b> ${name.replace("{fruit}", fruit)}</li>`).join("");
-      return `<article class="meal-card">
+      const done = store.get(completedKey(dayIndex), []).includes(index);
+      const nutrition = nutritionFor(key, dayIndex);
+      return `<article class="meal-card${done ? " done" : ""}">
         <div class="meal-main">
           <div class="meal-top">
-            <div class="meal-slot"><span class="meal-emoji" aria-hidden="true">${meal.emoji}</span><div><span>${slots[index]}</span><strong>${meal.kcal} kcal · ${meal.protein} g proteine</strong></div></div>
-            <span class="time">${meal.time}</span>
+            <div class="meal-slot"><span class="meal-emoji" aria-hidden="true">${done ? "✓" : meal.emoji}</span><div><span>${slots[index]}</span><strong>${Math.round(nutrition.kcal)} kcal · ${Math.round(nutrition.protein)} g proteine</strong></div></div>
+            <div class="meal-actions"><span class="time">${meal.time}</span><button class="done-button" type="button" data-meal-done="${index}" aria-pressed="${done}">${done ? "Fatto" : "Mangiato"}</button></div>
           </div>
           <h2>${meal.name}</h2>
           <ul class="ingredients">${ingredients}</ul>
           <p class="taste">✨ <strong>Buono con:</strong> ${meal.taste}</p>
         </div>
         <details class="recipe"><summary>Come si prepara</summary><p>${meal.method}</p></details>
+        <details class="swap"><summary>Non ho un ingrediente</summary><p>${meal.swap}</p></details>
       </article>`;
     }
 
     function renderSelectedDay() {
       const day = schedule[selectedDay];
-      const total = totals(day);
+      const total = totals(day, selectedDay);
       document.querySelector("#today-context").textContent = selectedDay === todayIndex() ? "Oggi mangi" : "Giorno selezionato";
       document.querySelector("#today-title").textContent = day.day;
-      document.querySelector("#today-kcal").textContent = `${total.kcal.toLocaleString("it-IT")} kcal`;
-      document.querySelector("#today-protein").textContent = `${total.protein} g proteine`;
-      document.querySelector("#meal-list").innerHTML = dayMeals(day).map((key, index) => mealCard(key, index, selectedDay)).join("");
+      document.querySelector("#today-kcal").textContent = `${Math.round(total.kcal).toLocaleString("it-IT")} kcal`;
+      document.querySelector("#today-protein").textContent = `${Math.round(total.protein)} g proteine`;
+      document.querySelector("#meal-list").innerHTML = dayMeals(day, selectedDay).map((key, index) => mealCard(key, index, selectedDay)).join("");
+      const completed = store.get(completedKey(selectedDay), []);
+      document.querySelector("#daily-progress-label").textContent = completed.length === 4 ? "Giornata completata" : `${completed.length}/4 pasti completati`;
+      document.querySelector("#daily-progress-bar").style.width = `${completed.length * 25}%`;
+      const habits = store.get(habitsKey(selectedDay), []);
+      document.querySelectorAll("#habit-grid input").forEach(input => input.checked = habits.includes(input.value));
       document.querySelectorAll(".day-button").forEach(button => button.setAttribute("aria-pressed", Number(button.dataset.day) === selectedDay));
 
       const prep = {
-        2: ["Meal prep questa sera", "Prepara 510 g di pollo, 120 g di riso e 750 g di patate. Congela le porzioni di domenica."],
-        6: ["Meal prep per iniziare facile", "Prepara 340 g di pollo, 60 g di riso e 500 g di patate per martedì e mercoledì."]
+        2: ["Meal prep questa sera", "Prepara 490 g di pollo, 120 g di riso e 700 g di patate. Congela le porzioni di domenica."],
+        6: ["Meal prep per iniziare facile", "Prepara 320 g di pollo, 60 g di riso e 450 g di patate per martedì e mercoledì."]
       };
       document.querySelector("#prep-alert").innerHTML = prep[selectedDay] ? `<aside class="prep-alert"><strong>⏱️ ${prep[selectedDay][0]}</strong><p>${prep[selectedDay][1]}</p></aside>` : "";
     }
@@ -648,30 +818,38 @@
     function renderWeek() {
       const today = todayIndex();
       document.querySelector("#week-list").innerHTML = schedule.map((day, index) => {
-        const total = totals(day);
-        const names = [
-          `${meals.breakfast.name} + ${fruitFor(index, true)}`,
-          `${meals[day.snack].name} + ${fruitFor(index, false)}`,
-          meals[day.lunch].name,
-          meals[day.dinner].name
-        ];
-        return `<details class="week-day" ${index === today ? "open" : ""}>
-          <summary>
+        const total = totals(day, index);
+        const dinner = dayMeals(day, index)[3];
+        return `<article class="week-day${index === today ? " today" : ""}">
+          <div class="week-head">
             <span class="week-date"><span>${day.short}</span><strong>${index === today ? "Oggi" : weekDate(index).getDate()}</strong></span>
-            <span class="week-copy"><strong>${day.day}</strong><span>${meals[day.lunch].name} · ${meals[day.dinner].name}</span></span>
-            <span class="week-total">${total.kcal}<span>${total.protein} g pro</span></span>
-          </summary>
-          <div class="week-detail">
-            ${["Colazione", "Spuntino", "Pranzo", "Cena"].map((slot, mealIndex) => `<div class="week-meal"><span>${slot}</span><strong>${names[mealIndex]}</strong></div>`).join("")}
+            <span class="week-copy"><strong>${day.day}</strong><span>${index === today ? "Il piano di oggi" : "Pranzo e cena"}</span></span>
+            <span class="week-total">${Math.round(total.kcal)}<span>${Math.round(total.protein)} g pro</span></span>
+          </div>
+          <div class="week-core">
+            <div class="week-meal"><span>Pranzo</span><strong>${meals[day.lunch].name}</strong></div>
+            <div class="week-meal"><span>Cena</span><strong>${meals[dinner].name}</strong></div>
             <button class="button secondary small" type="button" data-open-day="${index}">Apri ricette</button>
           </div>
-        </details>`;
+        </article>`;
       }).join("");
+      const weekly = schedule.map((day, index) => totals(day, index));
+      document.querySelector("#week-average-kcal").textContent = `≈ ${Math.round(weekly.reduce((sum, day) => sum + day.kcal, 0) / 7).toLocaleString("it-IT")}`;
+      document.querySelector("#week-average-protein").textContent = `≈ ${Math.round(weekly.reduce((sum, day) => sum + day.protein, 0) / 7)} g`;
+      document.querySelector("#week-free-count").textContent = secondFreeEnabled() ? "2 uscite" : "1 pizza";
+      document.querySelector("#second-free-meal").checked = secondFreeEnabled();
     }
 
     function renderShopping() {
       const checked = store.get("cut-shopping-v2", []);
-      document.querySelector("#shopping-groups").innerHTML = shopping.map(group => `<section class="shopping-group" data-group>
+      const list = shopping.map(group => ({ ...group, items: group.items.map(item => {
+        if (!secondFreeEnabled()) return item;
+        if (item.id === "tuna") return { ...item, amount: "4 scatolette", note: "circa 280 g sgocciolato" };
+        if (item.id === "pasta") return { ...item, note: "ne userai 160 g" };
+        if (item.id === "passata") return { ...item, note: "ne userai circa 300 g" };
+        return item;
+      }) }));
+      document.querySelector("#shopping-groups").innerHTML = list.map(group => `<section class="shopping-group" data-group>
         <h2><span aria-hidden="true">${group.icon}</span>${group.group}</h2>
         <div class="checklist">${group.items.map(item => `<label class="check-item" data-item>
           <input type="checkbox" value="${item.id}" ${checked.includes(item.id) ? "checked" : ""}>
@@ -699,6 +877,62 @@
       document.querySelector("#measurement-log").innerHTML = `<div class="log-row head"><span>Data</span><span>Peso</span><span>Vita</span><span></span></div>${rows}`;
     }
 
+    const habitNames = { steps: "8.000+ passi", creatine: "Creatina", training: "Pesi", sleep: "Sonno" };
+
+    function updateHistory(date, mealIndex, completed) {
+      const history = store.get("cut-history", {});
+      const entry = history[date] || { meals: {}, habits: [] };
+      if (mealIndex !== null) {
+        if (completed) {
+          const dayIndex = (new Date(`${date}T12:00:00`).getDay() + 6) % 7;
+          const mealKey = dayMeals(schedule[dayIndex], dayIndex)[mealIndex];
+          const nutrition = nutritionFor(mealKey, dayIndex);
+          entry.meals[mealIndex] = { key: mealKey, name: meals[mealKey].name, kcal: Math.round(nutrition.kcal), protein: Math.round(nutrition.protein) };
+        } else {
+          delete entry.meals[mealIndex];
+        }
+      }
+      entry.habits = store.get(`cut-habits-${date}`, []);
+      if (!Object.keys(entry.meals).length && !entry.habits.length) delete history[date];
+      else history[date] = entry;
+      store.set("cut-history", history);
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = store.get("cut-history", {});
+      const measurements = new Map(store.get("cut-measurements", []).map(entry => [entry.date, entry]));
+      const days = [];
+      for (let offset = 0; offset < 14; offset++) {
+        const date = new Date();
+        date.setHours(12, 0, 0, 0);
+        date.setDate(date.getDate() - offset);
+        const key = dateKey(date);
+        const entry = history[key];
+        const legacyMeals = store.get(`cut-meals-${key}`, []);
+        const legacyHabits = store.get(`cut-habits-${key}`, []);
+        if (!entry && !legacyMeals.length && !legacyHabits.length && !measurements.has(key)) continue;
+        const dayIndex = (date.getDay() + 6) % 7;
+        const mealRecords = entry?.meals && Object.keys(entry.meals).length
+          ? Object.values(entry.meals)
+          : legacyMeals.map(index => {
+              const mealKey = dayMeals(schedule[dayIndex], dayIndex)[index];
+              return { name: meals[mealKey].name };
+            });
+        const habits = entry?.habits?.length ? entry.habits : legacyHabits;
+        days.push({ key, date, mealRecords, habits, measurement: measurements.get(key) });
+      }
+
+      document.querySelector("#history-summary").textContent = days.length
+        ? `${days.length} ${days.length === 1 ? "giorno registrato" : "giorni registrati"} negli ultimi 14. Tocca un giorno per i dettagli.`
+        : "Nessun giorno registrato: usa “Mangiato” e le spunte quotidiane per iniziare.";
+      document.querySelector("#history-list").innerHTML = days.length ? days.map(day => `
+        <details class="history-day">
+          <summary><span><strong>${day.date.toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" })}</strong><span>${day.measurement ? `${Number(day.measurement.weight).toFixed(1)} kg${day.measurement.waist ? ` · vita ${Number(day.measurement.waist).toFixed(1)} cm` : ""}` : "Nessuna misura"}</span></span><span class="history-score">${day.mealRecords.length}/4 pasti<br>${day.habits.length}/4 abitudini</span></summary>
+          <div class="history-detail"><p><strong>Pasti:</strong> ${day.mealRecords.length ? day.mealRecords.map(meal => meal.name).join(" · ") : "nessuno segnato"}</p><p><strong>Abitudini:</strong> ${day.habits.length ? day.habits.map(habit => habitNames[habit]).join(" · ") : "nessuna segnata"}</p></div>
+        </details>`).join("") : "";
+    }
+
     document.addEventListener("click", event => {
       const navigation = event.target.closest("[data-panel], [data-go]");
       if (navigation) {
@@ -720,8 +954,29 @@
         renderSelectedDay();
         setPanel("oggi");
       }
+
+      const doneButton = event.target.closest("[data-meal-done]");
+      if (doneButton) {
+        const index = Number(doneButton.dataset.mealDone);
+        const key = completedKey(selectedDay);
+        const completed = store.get(key, []);
+        const isCompleted = !completed.includes(index);
+        store.set(key, isCompleted ? [...completed, index].sort() : completed.filter(item => item !== index));
+        updateHistory(dateKey(weekDate(selectedDay)), index, isCompleted);
+        renderSelectedDay();
+      }
     });
 
+    document.querySelector("#habit-grid").addEventListener("change", () => {
+      store.set(habitsKey(selectedDay), [...document.querySelectorAll("#habit-grid input:checked")].map(input => input.value));
+      updateHistory(dateKey(weekDate(selectedDay)), null, false);
+    });
+    document.querySelector("#second-free-meal").addEventListener("change", event => {
+      store.set("cut-second-free-meal", event.target.checked);
+      renderSelectedDay();
+      renderWeek();
+      renderShopping();
+    });
     document.querySelector("#shopping-groups").addEventListener("change", updateShopping);
     document.querySelector("#remaining-only").addEventListener("change", updateShopping);
     document.querySelector("#reset-shopping").addEventListener("click", () => {
@@ -747,19 +1002,25 @@
         tone = "alert";
       } else if (loss > .7) {
         title = "Stai scendendo troppo in fretta";
-        message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Aggiungi 100–150 kcal al giorno e ricontrolla la prossima media.`;
+        message = secondFreeEnabled()
+          ? `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Aggiungi 100–150 kcal al giorno e ricontrolla la prossima media.`
+          : `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Puoi attivare la seconda uscita oppure aggiungere 100–150 kcal al giorno.`;
         tone = "alert";
       } else if (loss > .53) {
         title = "Ritmo un po' alto";
-        message = "Se fame, sonno e forza sono buoni, osserva ancora una settimana; altrimenti aggiungi circa 100 kcal.";
+        message = secondFreeEnabled() ? "Mantieni tutto e osserva forza, fame e sonno." : "Se vuoi più flessibilità puoi provare la seconda uscita, poi ricontrolla la media.";
         tone = "watch";
       } else if (loss <= 0) {
-        title = "Non tagliare subito";
-        message = "Controlla aderenza e girovita per 2–3 settimane. Solo dopo riduci 100–150 kcal oppure aumenta i passi.";
+        title = secondFreeEnabled() ? "Torna a una sola uscita" : "Non tagliare subito";
+        message = secondFreeEnabled()
+          ? "Disattiva la seconda uscita per due settimane e ricontrolla peso e girovita prima di ridurre il cibo quotidiano."
+          : "Controlla aderenza e girovita per 2–3 settimane. Solo dopo riduci 100–150 kcal oppure aumenta i passi.";
         tone = "watch";
       } else if (loss < .25) {
-        title = "Calo ancora piccolo";
-        message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Conferma il trend per 2–3 settimane prima di cambiare calorie.`;
+        title = secondFreeEnabled() ? "Prima riduci le uscite" : "Calo ancora piccolo";
+        message = secondFreeEnabled()
+          ? "Torna alla sola pizza del sabato per due settimane: è la modifica più semplice e meno rigida."
+          : `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Conferma il trend per 2–3 settimane prima di cambiare calorie.`;
         tone = "watch";
       }
 
@@ -776,6 +1037,7 @@
       event.currentTarget.reset();
       document.querySelector("#log-date").value = localDate();
       renderLog();
+      renderHistory();
     });
 
     document.querySelector("#measurement-log").addEventListener("click", event => {
@@ -785,24 +1047,129 @@
       entries.splice(Number(button.dataset.delete), 1);
       store.set("cut-measurements", entries);
       renderLog();
+      renderHistory();
+    });
+
+    function fillFoodLabelForm() {
+      const foodId = document.querySelector("#food-label-select").value;
+      const food = { ...foodDatabase[foodId], ...(store.get("cut-food-overrides", {})[foodId] || {}) };
+      if (!food) return;
+      document.querySelector("#food-label-kcal").value = food.kcal;
+      document.querySelector("#food-label-protein").value = food.protein;
+    }
+
+    function refreshNutrition() {
+      renderSelectedDay();
+      renderWeek();
+    }
+
+    document.querySelector("#food-label-select").addEventListener("change", fillFoodLabelForm);
+    document.querySelector("#food-label-form").addEventListener("submit", event => {
+      event.preventDefault();
+      const foodId = document.querySelector("#food-label-select").value;
+      const overrides = store.get("cut-food-overrides", {});
+      overrides[foodId] = {
+        kcal: Number(document.querySelector("#food-label-kcal").value),
+        protein: Number(document.querySelector("#food-label-protein").value)
+      };
+      store.set("cut-food-overrides", overrides);
+      refreshNutrition();
+      const button = event.submitter;
+      button.textContent = "Salvato";
+      setTimeout(() => button.textContent = "Salva etichetta", 1200);
+    });
+    document.querySelector("#reset-food-label").addEventListener("click", () => {
+      const foodId = document.querySelector("#food-label-select").value;
+      const overrides = store.get("cut-food-overrides", {});
+      delete overrides[foodId];
+      store.set("cut-food-overrides", overrides);
+      fillFoodLabelForm();
+      refreshNutrition();
+    });
+
+    document.querySelector("#export-data").addEventListener("click", () => {
+      const data = {};
+      for (let index = 0; index < localStorage.length; index++) {
+        const key = localStorage.key(index);
+        if (key?.startsWith("cut-")) data[key] = localStorage.getItem(key);
+      }
+      const payload = { app: "Cut Smart", version: 1, exportedAt: new Date().toISOString(), data };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `cut-smart-backup-${localDate()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.querySelector("#import-data").addEventListener("click", () => document.querySelector("#import-file").click());
+    document.querySelector("#import-file").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const payload = JSON.parse(await file.text());
+        if (payload.app !== "Cut Smart" || !payload.data || typeof payload.data !== "object") throw new Error("Backup non valido");
+        if (!confirm("Ripristinare questo backup? I dati Cut Smart con le stesse chiavi verranno sostituiti.")) return;
+        for (const [key, value] of Object.entries(payload.data)) {
+          if (key.startsWith("cut-") && typeof value === "string") localStorage.setItem(key, value);
+        }
+        location.reload();
+      } catch {
+        alert("Il file selezionato non è un backup Cut Smart valido.");
+      } finally {
+        event.target.value = "";
+      }
     });
 
     function selfCheck() {
-      const daily = schedule.map(totals);
+      const daily = schedule.map((day, index) => totals(day, index));
       console.assert(schedule.length === 7, "Menu incompleto");
-      console.assert(daily.every(total => total.kcal >= 1650 && total.kcal <= 1800), "Calorie fuori intervallo");
+      console.assert(daily.every((total, index) => total.kcal >= 1650 && total.kcal <= (index === 5 ? 2250 : 2050)), "Calorie fuori intervallo");
       console.assert(daily.every(total => total.protein >= 140), "Proteine insufficienti");
-      console.assert(new Set(shopping.flatMap(group => group.items.map(item => item.id))).size === 21, "Lista spesa non valida");
+      console.assert(new Set(shopping.flatMap(group => group.items.map(item => item.id))).size === 22, "Lista spesa non valida");
     }
 
-    renderDayPicker();
-    renderSelectedDay();
-    renderWeek();
-    renderShopping();
-    renderLog();
-    document.querySelector("#log-date").value = localDate();
-    setPanel(location.hash.slice(1) || "oggi", false);
-    selfCheck();
+    let installPrompt;
+    const installButton = document.querySelector("#install-button");
+    if (!matchMedia("(display-mode: standalone)").matches) installButton.hidden = false;
+    window.addEventListener("beforeinstallprompt", event => {
+      event.preventDefault();
+      installPrompt = event;
+      installButton.hidden = false;
+    });
+    installButton.addEventListener("click", async () => {
+      if (installPrompt) {
+        installPrompt.prompt();
+        await installPrompt.userChoice;
+        installPrompt = undefined;
+      } else {
+        alert("Android/Chrome: menu ⋮ > Aggiungi a schermata Home. iPhone/Safari: Condividi > Aggiungi alla schermata Home.");
+      }
+    });
+    window.addEventListener("appinstalled", () => installButton.hidden = true);
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+
+    async function init() {
+      try {
+        const response = await fetch("data/foods.json");
+        if (!response.ok) throw new Error(`Food database: ${response.status}`);
+        foodDatabase = (await response.json()).foods;
+      } catch (error) {
+        console.warn("Uso i valori nutrizionali integrati", error);
+      }
+      renderDayPicker();
+      renderSelectedDay();
+      renderWeek();
+      renderShopping();
+      renderLog();
+      renderHistory();
+      fillFoodLabelForm();
+      document.querySelector("#log-date").value = localDate();
+      setPanel(location.hash.slice(1) || "oggi", false);
+      selfCheck();
+    }
+
+    init();
   </script>
 </body>
 </html>
