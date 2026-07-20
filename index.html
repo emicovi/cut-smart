@@ -140,6 +140,8 @@
     .daily-progress-copy { min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
     .daily-progress strong { color: var(--green-dark); font-size: .7rem; }
     .daily-progress-copy span { color: var(--green-dark); font-size: .68rem; }
+    .next-action { min-height: 28px; padding: 4px 8px; border: 1px solid #afd1bb; border-radius: 9px; color: var(--green-dark); background: #fff; font-size: .65rem; font-weight: 900; }
+    .next-action:hover { background: #f7fff9; }
     .daily-progress-track { height: 7px; overflow: hidden; border-radius: 999px; background: rgba(23, 107, 67, .13); }
     .daily-progress-bar { width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .2s ease; }
 
@@ -226,6 +228,9 @@
     .summary-box { min-width: 0; padding: 11px 6px; border: 1px solid var(--line); border-radius: 13px; text-align: center; background: #fff; }
     .summary-box strong { display: block; font-size: .92rem; }
     .summary-box span { display: block; margin-top: 2px; color: var(--muted); font-size: .64rem; }
+    .target-note { margin-bottom: 11px; padding: 11px 13px; border: 1px solid #c8dfcf; border-radius: 14px; color: #385246; background: var(--green-soft); font-size: .74rem; line-height: 1.45; }
+    .target-note strong { color: var(--green-dark); }
+    .target-note a { color: var(--green-dark); font-weight: 850; }
     .flex-card { margin-bottom: 13px; padding: 14px; border: 1px solid #ead888; border-radius: 15px; background: var(--yellow-soft); }
     .flex-card h2 { margin: 0; font-size: .95rem; }
     .flex-card p { margin: 5px 0 0; color: #63552d; font-size: .76rem; line-height: 1.45; }
@@ -259,8 +264,10 @@
     .prep-card header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .prep-card h3 { margin: 0; font-size: .91rem; }
     .prep-card header span { padding: 4px 7px; border-radius: 999px; color: #8c4a19; background: var(--yellow-soft); font-size: .66rem; font-weight: 900; }
-    .prep-card ol { margin: 10px 0 0; padding-left: 19px; color: #445149; font-size: .77rem; line-height: 1.45; }
+    .prep-card ol { margin: 10px 0 0; padding-left: 0; color: #445149; font-size: .77rem; line-height: 1.45; list-style: none; }
     .prep-card li + li { margin-top: 6px; }
+    .prep-step { display: flex; align-items: flex-start; gap: 7px; }
+    .prep-step input { width: 17px; height: 17px; flex: 0 0 auto; margin: 1px 0 0; accent-color: var(--green); }
 
     .shopping-progress { padding: 15px; border-radius: 18px; color: #fff; background: var(--green); }
     .progress-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; }
@@ -410,7 +417,7 @@
         <header class="today-summary" aria-live="polite">
           <div><small id="today-context">Oggi mangi</small><h1 id="today-title">Lunedì</h1></div>
           <div class="today-total"><strong id="today-kcal">1.685 kcal</strong><span id="today-protein">147 g proteine</span></div>
-          <div class="daily-progress"><div class="daily-progress-copy"><strong id="daily-progress-label">0/4 pasti completati</strong><span id="today-next">Prossimo: colazione · 2 min</span></div><div class="daily-progress-track" aria-hidden="true"><div class="daily-progress-bar" id="daily-progress-bar"></div></div></div>
+          <div class="daily-progress"><div class="daily-progress-copy"><strong id="daily-progress-label">0/4 pasti completati</strong><span id="today-next">Prossimo: colazione · 2 min</span><button class="next-action" id="today-next-action" type="button" hidden>Apri preparazione</button></div><div class="daily-progress-track" aria-hidden="true"><div class="daily-progress-bar" id="daily-progress-bar"></div></div></div>
         </header>
 
         <div class="meal-list" id="meal-list"></div>
@@ -446,8 +453,10 @@
         <div class="summary-grid">
           <div class="summary-box"><strong id="week-average-kcal">≈ 1.850</strong><span>kcal medie</span></div>
           <div class="summary-box"><strong id="week-average-protein">≈ 156 g</strong><span>proteine medie</span></div>
-          <div class="summary-box"><strong id="week-free-count">1 pizza</strong><span>già inclusa</span></div>
+          <div class="summary-box"><strong id="week-protein-target">1,6–2,0 g/kg</strong><span>target proteine</span></div>
         </div>
+
+        <div class="target-note" id="protein-target-note"><strong>Ricomposizione:</strong> registra il peso nel Check per calcolare il tuo target. Il deficit moderato, la forza e il girovita contano più di tagli estremi.</div>
 
         <aside class="flex-card">
           <h2>🍕 Uscite senza rovinare il cut</h2>
@@ -464,21 +473,21 @@
 
         <section class="section">
           <div class="section-title"><h2>Meal prep: solo due volte</h2><p>Prepari le basi; pasta, merluzzo e frittata restano veloci e più buoni fatti al momento.</p></div>
-          <div class="prep-grid">
+          <div class="prep-grid" id="prep-grid">
             <article class="prep-card">
               <header><h3>Domenica</h3><span>25 minuti</span></header>
               <ol>
-                <li>Cuoci <strong>320 g di pollo</strong> con paprika, aglio e limone.</li>
-                <li>Prepara <strong>60 g di riso</strong> e <strong>450 g di patate</strong>.</li>
-                <li>Dividi per i pasti di martedì e mercoledì.</li>
+                <li><label class="prep-step"><input type="checkbox" data-prep-step="sun-chicken"> <span>Cuoci <strong>320 g di pollo</strong> con paprika, aglio e limone.</span></label></li>
+                <li><label class="prep-step"><input type="checkbox" data-prep-step="sun-sides"> <span>Prepara <strong>60 g di riso</strong> e <strong>450 g di patate</strong>.</span></label></li>
+                <li><label class="prep-step"><input type="checkbox" data-prep-step="sun-portions"> <span>Dividi per i pasti di martedì e mercoledì.</span></label></li>
               </ol>
             </article>
             <article class="prep-card">
               <header><h3>Mercoledì</h3><span>30 minuti</span></header>
               <ol>
-                <li>Cuoci <strong>490 g di pollo</strong>: metà curry, metà paprika.</li>
-                <li>Prepara <strong>120 g di riso</strong> e <strong>700 g di patate</strong>.</li>
-                <li>Dividi per giovedì–domenica e congela le porzioni di domenica.</li>
+                <li><label class="prep-step"><input type="checkbox" data-prep-step="wed-chicken"> <span>Cuoci <strong>490 g di pollo</strong>: metà curry, metà paprika.</span></label></li>
+                <li><label class="prep-step"><input type="checkbox" data-prep-step="wed-sides"> <span>Prepara <strong>120 g di riso</strong> e <strong>700 g di patate</strong>.</span></label></li>
+                <li><label class="prep-step"><input type="checkbox" data-prep-step="wed-portions"> <span>Dividi per giovedì–domenica e congela le porzioni di domenica.</span></label></li>
               </ol>
             </article>
           </div>
@@ -579,7 +588,7 @@
           </div>
         </details>
 
-        <div class="reality-note"><strong>Una cosa importante:</strong> non puoi scegliere di perdere solo il grasso della pancia. Se girovita e media del peso scendono mentre la forza regge, il piano sta funzionando. Mettere massa durante il cut è possibile, ma mantenere o aumentare la forza è il segnale più realistico da seguire.</div>
+        <div class="reality-note"><strong>La regola scientifica:</strong> non puoi scegliere di perdere solo il grasso della pancia. Un deficit moderato, 3 allenamenti con i pesi, proteine distribuite nei 4 pasti e sonno aiutano a perdere grasso preservando la massa; aumentarla durante il deficit è più probabile se sei principiante o ritorni ad allenarti. Riferimenti: <a href="https://jissn.biomedcentral.com/articles/10.1186/s12970-017-0177-8" target="_blank" rel="noreferrer">ISSN</a>, <a href="https://www.who.int/publications/i/item/9789240073593" target="_blank" rel="noreferrer">WHO</a> e <a href="https://www.efsa.europa.eu/en/safe2eat/proper-food-handling" target="_blank" rel="noreferrer">EFSA</a>.</div>
       </div>
     </section>
   </main>
@@ -760,6 +769,8 @@
     const completedKey = dayIndex => `cut-meals-${dateKey(weekDate(dayIndex))}`;
     const habitsKey = dayIndex => `cut-habits-${dateKey(weekDate(dayIndex))}`;
     const secondFreeEnabled = () => store.get("cut-second-free-meal", false) === true;
+    const prepStepIds = ["sun-chicken", "sun-sides", "sun-portions", "wed-chicken", "wed-sides", "wed-portions"];
+    const validPrepStep = step => prepStepIds.includes(step);
     const validMealIndex = index => Number.isInteger(index) && index >= 0 && index < 4;
     const validHabit = habit => ["steps", "creatine", "training", "sleep"].includes(habit);
     const validShoppingId = id => shopping.some(group => group.items.some(item => item.id === id));
@@ -768,7 +779,23 @@
       && Number.isFinite(Number(value.kcal)) && Number(value.kcal) >= 1 && Number(value.kcal) <= 1000
       && Number.isFinite(Number(value.protein)) && Number(value.protein) >= 0 && Number(value.protein) <= 100;
     const nextMealIndex = completed => [0, 1, 2, 3].find(index => !completed.includes(index));
+    const proteinTarget = weight => {
+      const kg = Number(weight);
+      return Number.isFinite(kg) && kg >= 40 && kg <= 140 ? { low: Math.round(kg * 1.6), high: Math.round(kg * 2) } : null;
+    };
     const matchesShoppingQuery = (item, query) => !query.trim() || [item.amount, item.name, item.note].filter(Boolean).join(" ").toLocaleLowerCase().includes(query.trim().toLocaleLowerCase());
+    const recommendationFor = (previous, current, performance, secondFree) => {
+      const loss = Number(previous) - Number(current);
+      if (!Number.isFinite(loss)) return { title: "Controlla i dati", message: "Inserisci due medie di peso valide.", tone: "watch" };
+      if (performance === "down") return { title: "Proteggi la forza", message: "Aggiungi 100–150 kcal al giorno per una settimana, poi ricontrolla media e allenamenti.", tone: "alert" };
+      if (loss > .7) return { title: "Rallenta il deficit", message: "Aggiungi 100–150 kcal al giorno per una settimana, poi ricontrolla la media.", tone: "alert" };
+      if (loss > .53) return { title: "Mantieni il piano", message: `Hai perso ${loss.toFixed(2).replace(".", ",")} kg: non cambiare nulla finché forza, fame e sonno restano buoni.`, tone: "watch" };
+      if (loss <= 0) return { title: "Non tagliare ancora", message: "Mantieni il piano per 2–3 settimane e usa anche il trend del girovita prima di ridurre il cibo.", tone: "watch" };
+      if (loss < .25) return secondFree
+        ? { title: "Riduci una sola uscita", message: "Disattiva la seconda uscita per due settimane e ricontrolla peso e girovita.", tone: "watch" }
+        : { title: "Mantieni e osserva", message: `Hai perso ${loss.toFixed(2).replace(".", ",")} kg: mantieni il piano per un'altra settimana prima di modificarlo.`, tone: "watch" };
+      return { title: "Continua uguale", message: `Hai perso ${loss.toFixed(2).replace(".", ",")} kg: mantieni calorie e allenamento per un'altra settimana.`, tone: "good" };
+    };
 
     function sanitizeTrackingData() {
       const today = localDate();
@@ -787,6 +814,9 @@
       const rawShopping = store.get("cut-shopping-v2", []);
       const cleanShopping = storedList("cut-shopping-v2", validShoppingId);
       if (JSON.stringify(cleanShopping) !== JSON.stringify(rawShopping)) store.set("cut-shopping-v2", cleanShopping);
+      const rawPrep = store.get("cut-prep", []);
+      const cleanPrep = storedList("cut-prep", validPrepStep);
+      if (JSON.stringify(cleanPrep) !== JSON.stringify(rawPrep)) store.set("cut-prep", cleanPrep);
       if (store.get("cut-second-free-meal", false) !== true && store.get("cut-second-free-meal", false) !== false) store.set("cut-second-free-meal", false);
       const rawOverrides = store.get("cut-food-overrides", {});
       const cleanOverrides = isRecord(rawOverrides)
@@ -861,7 +891,7 @@
       const done = storedList(completedKey(dayIndex), validMealIndex).includes(index);
       const trackable = canTrackDay(dayIndex);
       const nutrition = nutritionFor(key, dayIndex);
-      return `<article class="meal-card${done ? " done" : ""}">
+      return `<article class="meal-card${done ? " done" : ""}" data-meal-card="${index}">
         <div class="meal-main">
           <div class="meal-top">
             <div class="meal-slot"><span class="meal-emoji" aria-hidden="true">${done ? "✓" : meal.emoji}</span><div><span>${slots[index]}</span><strong>${Math.round(nutrition.kcal)} kcal · ${Math.round(nutrition.protein)} g proteine</strong></div></div>
@@ -887,10 +917,16 @@
       const trackable = canTrackDay(selectedDay);
       const completed = trackable ? storedList(completedKey(selectedDay), validMealIndex) : [];
       const nextIndex = nextMealIndex(completed);
+      const nextAction = document.querySelector("#today-next-action");
       document.querySelector("#daily-progress-label").textContent = trackable ? (completed.length === 4 ? "Giornata completata" : `${completed.length}/4 pasti completati`) : "Pianificato";
       document.querySelector("#today-next").textContent = trackable
         ? (nextIndex === undefined ? "Tutti i pasti segnati" : `Prossimo: ${["colazione", "spuntino", "pranzo", "cena"][nextIndex]} · ${meals[dayMeals(day, selectedDay)[nextIndex]].time}`)
         : "Spunte disponibili quel giorno";
+      nextAction.hidden = !trackable || nextIndex === undefined;
+      if (nextIndex !== undefined) {
+        nextAction.dataset.nextMeal = nextIndex;
+        nextAction.textContent = `Prepara ${["colazione", "spuntino", "pranzo", "cena"][nextIndex].toLowerCase()}`;
+      }
       document.querySelector("#daily-progress-bar").style.width = `${Math.min(completed.length, 4) * 25}%`;
       const habits = trackable ? storedList(habitsKey(selectedDay), validHabit) : [];
       document.querySelectorAll("#habit-grid input").forEach(input => {
@@ -907,8 +943,19 @@
       document.querySelector("#prep-alert").innerHTML = prep[selectedDay] ? `<aside class="prep-alert"><strong>⏱️ ${prep[selectedDay][0]}</strong><p>${prep[selectedDay][1]}</p></aside>` : "";
     }
 
+    function renderPrepChecklist() {
+      const completed = storedList("cut-prep", validPrepStep);
+      document.querySelectorAll("[data-prep-step]").forEach(input => input.checked = completed.includes(input.dataset.prepStep));
+    }
+
     function renderWeek() {
       const today = todayIndex();
+      const measurements = normalizeMeasurements(store.get("cut-measurements", [])).sort((a, b) => b.date.localeCompare(a.date));
+      const target = proteinTarget(measurements[0]?.weight);
+      document.querySelector("#week-protein-target").textContent = target ? `${target.low}–${target.high} g` : "1,6–2,0 g/kg";
+      document.querySelector("#protein-target-note").innerHTML = target
+        ? `<strong>Ricomposizione:</strong> con ${Number(measurements[0].weight).toFixed(1).replace(".", ",")} kg, un intervallo pratico è ${target.low}–${target.high} g di proteine al giorno. Il menu ne offre circa 156 g: se sei molto più leggero o hai una patologia renale, non inseguire il numero senza un professionista.`
+        : "<strong>Ricomposizione:</strong> registra il peso nel Check per calcolare il target. In assenza di dati, usa 1,6–2,0 g/kg/die come intervallo pratico per chi si allena; il deficit moderato e la forza contano più di tagli estremi.";
       document.querySelector("#week-list").innerHTML = schedule.map((day, index) => {
         const total = totals(day, index);
         const dinner = dayMeals(day, index)[3];
@@ -928,7 +975,6 @@
       const weekly = schedule.map((day, index) => totals(day, index));
       document.querySelector("#week-average-kcal").textContent = `≈ ${Math.round(weekly.reduce((sum, day) => sum + day.kcal, 0) / 7).toLocaleString("it-IT")}`;
       document.querySelector("#week-average-protein").textContent = `≈ ${Math.round(weekly.reduce((sum, day) => sum + day.protein, 0) / 7)} g`;
-      document.querySelector("#week-free-count").textContent = secondFreeEnabled() ? "2 uscite" : "1 pizza";
       document.querySelector("#second-free-meal").checked = secondFreeEnabled();
     }
 
@@ -1043,6 +1089,17 @@
     }
 
     document.addEventListener("click", event => {
+      const nextAction = event.target.closest("#today-next-action");
+      if (nextAction && !nextAction.hidden) {
+        const card = document.querySelector(`[data-meal-card="${nextAction.dataset.nextMeal}"]`);
+        const recipe = card?.querySelector(".recipe");
+        if (card && recipe) {
+          recipe.open = true;
+          const bounds = card.getBoundingClientRect();
+          if (bounds.top < 78 || bounds.bottom > innerHeight) card.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+
       const navigation = event.target.closest("[data-panel], [data-go]");
       if (navigation) {
         event.preventDefault();
@@ -1083,6 +1140,12 @@
 
     window.addEventListener("hashchange", () => setPanel(location.hash.slice(1), false));
 
+    document.querySelector("#prep-grid").addEventListener("change", event => {
+      const input = event.target.closest("[data-prep-step]");
+      if (!input) return;
+      store.set("cut-prep", [...document.querySelectorAll("[data-prep-step]:checked")].map(step => step.dataset.prepStep).filter(validPrepStep));
+    });
+
     document.querySelector("#habit-grid").addEventListener("change", () => {
       if (!canTrackDay(selectedDay)) return renderSelectedDay();
       store.set(habitsKey(selectedDay), [...document.querySelectorAll("#habit-grid input:checked")].map(input => input.value).filter(validHabit));
@@ -1107,43 +1170,10 @@
       event.preventDefault();
       const previous = Number(document.querySelector("#previous-average").value);
       const current = Number(document.querySelector("#current-average").value);
-      const performance = document.querySelector("#performance").value;
-      const loss = previous - current;
+      const recommendation = recommendationFor(previous, current, performance, secondFreeEnabled());
       const box = document.querySelector("#recommendation");
-      let title = "Continua uguale";
-      let message = `Hai perso ${loss.toFixed(2).replace(".", ",")} kg: il ritmo va bene. Mantieni calorie e allenamento per un'altra settimana.`;
-      let tone = "good";
-
-      if (performance === "down") {
-        title = "Proteggi forza e recupero";
-        message = "La forza cala da due settimane: aggiungi 100–150 kcal e controlla sonno, stress e volume di allenamento.";
-        tone = "alert";
-      } else if (loss > .7) {
-        title = "Stai scendendo troppo in fretta";
-        message = secondFreeEnabled()
-          ? `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Aggiungi 100–150 kcal al giorno e ricontrolla la prossima media.`
-          : `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Puoi attivare la seconda uscita oppure aggiungere 100–150 kcal al giorno.`;
-        tone = "alert";
-      } else if (loss > .53) {
-        title = "Ritmo un po' alto";
-        message = secondFreeEnabled() ? "Mantieni tutto e osserva forza, fame e sonno." : "Se vuoi più flessibilità puoi provare la seconda uscita, poi ricontrolla la media.";
-        tone = "watch";
-      } else if (loss <= 0) {
-        title = secondFreeEnabled() ? "Torna a una sola uscita" : "Non tagliare subito";
-        message = secondFreeEnabled()
-          ? "Disattiva la seconda uscita per due settimane e ricontrolla peso e girovita prima di ridurre il cibo quotidiano."
-          : "Controlla aderenza e girovita per 2–3 settimane. Solo dopo riduci 100–150 kcal oppure aumenta i passi.";
-        tone = "watch";
-      } else if (loss < .25) {
-        title = secondFreeEnabled() ? "Prima riduci le uscite" : "Calo ancora piccolo";
-        message = secondFreeEnabled()
-          ? "Torna alla sola pizza del sabato per due settimane: è la modifica più semplice e meno rigida."
-          : `Hai perso ${loss.toFixed(2).replace(".", ",")} kg. Conferma il trend per 2–3 settimane prima di cambiare calorie.`;
-        tone = "watch";
-      }
-
-      box.dataset.tone = tone;
-      box.innerHTML = `<strong>${title}</strong><p>${message}</p>`;
+      box.dataset.tone = recommendation.tone;
+      box.innerHTML = `<strong>${recommendation.title}</strong><p>${recommendation.message}</p>`;
     });
 
     document.querySelector("#log-form").addEventListener("submit", event => {
@@ -1276,6 +1306,7 @@
       renderDayPicker();
       renderSelectedDay();
       renderWeek();
+      renderPrepChecklist();
       renderShopping();
       renderLog();
       renderHistory();

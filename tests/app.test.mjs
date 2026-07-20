@@ -31,10 +31,10 @@ const coreEnd = script.indexOf('document.addEventListener("click"');
 assert.ok(coreEnd > 0, "Core boundary missing");
 const core = `${script.slice(0, coreEnd)}
 foodDatabase = globalThis.__foods;
-globalThis.__cut = { meals, mealComponents, schedule, shopping, nutritionFor, totals, dayMeals, mealCard, todayIndex, weekDate, dateKey, localDate, isCalendarDate, isFutureDate, canTrackDay, isValidMeasurementDate, isValidMeasurement, normalizeMeasurements, sanitizeTrackingData, nextMealIndex, matchesShoppingQuery, isRecord, storedList, storedRecord, validMealIndex, validHabit, validShoppingId, validFoodOverride, labelFoodIds };`;
+globalThis.__cut = { meals, mealComponents, schedule, shopping, nutritionFor, totals, dayMeals, mealCard, todayIndex, weekDate, dateKey, localDate, isCalendarDate, isFutureDate, canTrackDay, isValidMeasurementDate, isValidMeasurement, normalizeMeasurements, sanitizeTrackingData, nextMealIndex, proteinTarget, recommendationFor, matchesShoppingQuery, isRecord, storedList, storedRecord, validMealIndex, validHabit, validShoppingId, validFoodOverride, labelFoodIds };`;
 const context = vm.createContext({ console, Date: FixedDate, JSON, Math, Object, Array, Set, Map, localStorage, __foods: foods });
 vm.runInContext(core, context, { filename: "index.html:inline" });
-const { meals, mealComponents, schedule, shopping, nutritionFor, totals, dayMeals, mealCard, todayIndex, weekDate, dateKey, localDate, isCalendarDate, isFutureDate, canTrackDay, isValidMeasurementDate, isValidMeasurement, normalizeMeasurements, sanitizeTrackingData, nextMealIndex, matchesShoppingQuery, isRecord, storedList, storedRecord, validMealIndex, validHabit, validShoppingId, validFoodOverride, labelFoodIds } = context.__cut;
+const { meals, mealComponents, schedule, shopping, nutritionFor, totals, dayMeals, mealCard, todayIndex, weekDate, dateKey, localDate, isCalendarDate, isFutureDate, canTrackDay, isValidMeasurementDate, isValidMeasurement, normalizeMeasurements, sanitizeTrackingData, nextMealIndex, proteinTarget, recommendationFor, matchesShoppingQuery, isRecord, storedList, storedRecord, validMealIndex, validHabit, validShoppingId, validFoodOverride, labelFoodIds } = context.__cut;
 
 assert.equal(schedule.length, 7, "The plan must cover seven days");
 assert.equal(new Set(shopping.flatMap(group => group.items.map(item => item.id))).size, 22, "Shopping IDs must be unique");
@@ -78,6 +78,12 @@ assert.match(html, /id="shopping-search"/, "Shopping list should be searchable")
 assert.match(html, /data-group-count>0\/\$\{group\.items\.length\}/, "Category counters should start at zero items taken");
 assert.match(html, /addEventListener\("hashchange"/, "Deep links should keep the visible panel in sync");
 assert.deepEqual([nextMealIndex([]), nextMealIndex([0]), nextMealIndex([0, 2]), nextMealIndex([0, 1, 2, 3])], [0, 1, 1, undefined]);
+assert.equal(JSON.stringify(proteinTarget(70)), JSON.stringify({ low: 112, high: 140 }));
+assert.equal(proteinTarget("invalid"), null, "Invalid weights must not create a protein target");
+assert.equal(recommendationFor(70, 69.6, "stable", false).title, "Continua uguale");
+assert.equal(recommendationFor(70, 69.8, "stable", true).title, "Riduci una sola uscita");
+assert.equal(recommendationFor(70, 69, "stable", false).tone, "alert");
+assert.equal(recommendationFor(70, 69.6, "down", false).title, "Proteggi la forza");
 assert.equal(matchesShoppingQuery({ amount: "1 kg", name: "Pollo o tacchino" }, "pollo"), true);
 assert.equal(matchesShoppingQuery({ amount: "1 kg", name: "Pollo o tacchino" }, "riso"), false);
 assert.equal(isRecord({}), true);
