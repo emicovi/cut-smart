@@ -35,6 +35,7 @@
     }
 
     * { box-sizing: border-box; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     html { scroll-behavior: smooth; }
     body { margin: 0; min-width: 320px; background: var(--canvas); }
     body, button, input, select { font: inherit; }
@@ -143,7 +144,7 @@
     .daily-progress-bar { width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .2s ease; }
 
     .meal-list { display: grid; gap: 10px; margin-top: 11px; }
-    .meal-card { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: 0 4px 15px rgba(16, 34, 25, .035); }
+    .meal-card { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: 0 4px 15px rgba(16, 34, 25, .035); scroll-margin-top: 78px; }
     .meal-card.done { border-color: #a9cfb5; background: #fbfefc; }
     .meal-card.done h2 { color: var(--green); }
     .meal-card.done .meal-emoji { background: var(--green-soft); }
@@ -270,7 +271,11 @@
     .progress-count span { color: #d8ecdf; font-size: .62rem; }
     .progress-track { height: 7px; overflow: hidden; margin-top: 12px; border-radius: 999px; background: rgba(255, 255, 255, .2); }
     .progress-bar { width: 0; height: 100%; border-radius: inherit; background: #f2c85b; transition: width .2s ease; }
-    .shopping-tools { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin: 10px 0; }
+    .shopping-tools { display: grid; gap: 8px; margin: 10px 0; }
+    .shopping-search { position: relative; display: block; }
+    .shopping-search input { width: 100%; min-height: 44px; padding: 8px 11px; border: 1px solid #bdc9c1; border-radius: 11px; background: #fff; }
+    .shopping-search input::placeholder { color: #728078; }
+    .shopping-tools-row { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
     .remaining { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; color: var(--muted); font-size: .76rem; font-weight: 800; }
     .remaining input { width: 18px; height: 18px; accent-color: var(--green); }
     .reset { min-height: 38px; padding: 7px 10px; border: 1px solid #e3c5c2; border-radius: 10px; color: var(--red); background: #fff; font-size: .73rem; font-weight: 850; }
@@ -498,8 +503,8 @@
         </section>
 
         <div class="shopping-tools">
-          <label class="remaining"><input id="remaining-only" type="checkbox"> Mostra solo ciò che manca</label>
-          <button class="reset" id="reset-shopping" type="button">Azzera</button>
+          <label class="shopping-search"><span class="sr-only">Cerca nella lista della spesa</span><input id="shopping-search" type="search" placeholder="Cerca pollo, riso, yogurt..." autocomplete="off"></label>
+          <div class="shopping-tools-row"><label class="remaining"><input id="remaining-only" type="checkbox"> Mostra solo ciò che manca</label><button class="reset" id="reset-shopping" type="button">Azzera</button></div>
         </div>
 
         <div class="shopping-groups" id="shopping-groups"></div>
@@ -538,7 +543,7 @@
 
           <article class="card">
             <h2>Salva peso e girovita</h2>
-            <p class="card-intro">Misurali al mattino, nelle stesse condizioni.</p>
+            <p class="card-intro">Misurali al mattino, nelle stesse condizioni. Una misura per giorno: salvando la stessa data la aggiorni.</p>
             <form id="log-form" class="form-grid two">
               <div class="field"><label for="log-date">Data</label><input id="log-date" name="date" type="date" required></div>
               <div class="field"><label for="log-weight">Peso (kg)</label><input id="log-weight" name="weight" type="number" min="40" max="140" step="0.1" inputmode="decimal" placeholder="69,7" required></div>
@@ -715,6 +720,15 @@
       get(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
       set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }
     };
+    const isRecord = value => value !== null && typeof value === "object" && !Array.isArray(value);
+    const storedList = (key, allowed) => {
+      const value = store.get(key, []);
+      return Array.isArray(value) ? (allowed ? value.filter(allowed) : value) : [];
+    };
+    const storedRecord = key => {
+      const value = store.get(key, {});
+      return isRecord(value) ? value : {};
+    };
 
     const panels = ["oggi", "settimana", "spesa", "check"];
     const aliases = { piano: "oggi", progressi: "check", checkin: "check", fonti: "check" };
@@ -734,23 +748,58 @@
     const isFutureDate = date => dateKey(date) > localDate();
     const canTrackDay = dayIndex => !isFutureDate(weekDate(dayIndex));
     const isValidMeasurementDate = value => isCalendarDate(value) && value <= localDate();
+    const isValidMeasurement = entry => Boolean(entry) && isValidMeasurementDate(entry.date)
+      && Number.isFinite(Number(entry.weight)) && Number(entry.weight) >= 40 && Number(entry.weight) <= 140
+      && (!entry.waist || (Number.isFinite(Number(entry.waist)) && Number(entry.waist) >= 50 && Number(entry.waist) <= 160));
+    const normalizeMeasurements = entries => {
+      const source = Array.isArray(entries) ? entries : [];
+      const byDate = new Map();
+      source.filter(isValidMeasurement).forEach(entry => byDate.set(entry.date, entry));
+      return [...byDate.values()];
+    };
     const completedKey = dayIndex => `cut-meals-${dateKey(weekDate(dayIndex))}`;
     const habitsKey = dayIndex => `cut-habits-${dateKey(weekDate(dayIndex))}`;
-    const secondFreeEnabled = () => store.get("cut-second-free-meal", false);
+    const secondFreeEnabled = () => store.get("cut-second-free-meal", false) === true;
+    const validMealIndex = index => Number.isInteger(index) && index >= 0 && index < 4;
+    const validHabit = habit => ["steps", "creatine", "training", "sleep"].includes(habit);
+    const validShoppingId = id => shopping.some(group => group.items.some(item => item.id === id));
+    const labelFoodIds = ["greek_yogurt_0", "cottage", "tuna", "dark_chocolate", "bread"];
+    const validFoodOverride = value => isRecord(value)
+      && Number.isFinite(Number(value.kcal)) && Number(value.kcal) >= 1 && Number(value.kcal) <= 1000
+      && Number.isFinite(Number(value.protein)) && Number(value.protein) >= 0 && Number(value.protein) <= 100;
+    const nextMealIndex = completed => [0, 1, 2, 3].find(index => !completed.includes(index));
+    const matchesShoppingQuery = (item, query) => !query.trim() || [item.amount, item.name, item.note].filter(Boolean).join(" ").toLocaleLowerCase().includes(query.trim().toLocaleLowerCase());
 
     function sanitizeTrackingData() {
       const today = localDate();
       const datedKeys = Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index)).filter(Boolean);
       for (const key of datedKeys) {
-        const date = key.match(/^cut-(?:meals|habits)-(\d{4}-\d{2}-\d{2})$/)?.[1];
-        if (date && (!isCalendarDate(date) || date > today)) localStorage.removeItem(key);
+        const match = key.match(/^cut-(meals|habits)-(\d{4}-\d{2}-\d{2})$/);
+        if (!match) continue;
+        const [, type, date] = match;
+        if (!isCalendarDate(date) || date > today) {
+          localStorage.removeItem(key);
+          continue;
+        }
+        const clean = storedList(key, type === "meals" ? validMealIndex : validHabit);
+        if (JSON.stringify(clean) !== localStorage.getItem(key)) store.set(key, clean);
       }
-      const history = store.get("cut-history", {});
-      const cleanHistory = Object.fromEntries(Object.entries(history).filter(([date]) => isCalendarDate(date) && date <= today));
-      if (Object.keys(cleanHistory).length !== Object.keys(history).length) store.set("cut-history", cleanHistory);
+      const rawShopping = store.get("cut-shopping-v2", []);
+      const cleanShopping = storedList("cut-shopping-v2", validShoppingId);
+      if (JSON.stringify(cleanShopping) !== JSON.stringify(rawShopping)) store.set("cut-shopping-v2", cleanShopping);
+      if (store.get("cut-second-free-meal", false) !== true && store.get("cut-second-free-meal", false) !== false) store.set("cut-second-free-meal", false);
+      const rawOverrides = store.get("cut-food-overrides", {});
+      const cleanOverrides = isRecord(rawOverrides)
+        ? Object.fromEntries(Object.entries(rawOverrides).filter(([foodId, value]) => labelFoodIds.includes(foodId) && validFoodOverride(value)))
+        : {};
+      if (JSON.stringify(cleanOverrides) !== JSON.stringify(rawOverrides)) store.set("cut-food-overrides", cleanOverrides);
+      const rawHistory = store.get("cut-history", {});
+      const history = isRecord(rawHistory) ? rawHistory : {};
+      const cleanHistory = Object.fromEntries(Object.entries(history).filter(([date, entry]) => isCalendarDate(date) && date <= today && isRecord(entry)));
+      if (!isRecord(rawHistory) || Object.keys(cleanHistory).length !== Object.keys(history).length) store.set("cut-history", cleanHistory);
       const measurements = store.get("cut-measurements", []);
-      const cleanMeasurements = measurements.filter(entry => isValidMeasurementDate(entry.date));
-      if (cleanMeasurements.length !== measurements.length) store.set("cut-measurements", cleanMeasurements);
+      const cleanMeasurements = normalizeMeasurements(measurements);
+      if (JSON.stringify(cleanMeasurements) !== JSON.stringify(measurements)) store.set("cut-measurements", cleanMeasurements);
     }
 
     const dayMeals = (day, dayIndex) => ["breakfast", day.snack, day.lunch, secondFreeEnabled() && dayIndex === 4 ? "free2" : day.dinner];
@@ -764,12 +813,12 @@
       const meal = meals[mealKey];
       const components = mealComponents[mealKey];
       if (!components || !Object.keys(foodDatabase).length) return { kcal: meal.kcal, protein: meal.protein, carbs: 0, fat: 0 };
-      const overrides = store.get("cut-food-overrides", {});
+      const overrides = storedRecord("cut-food-overrides");
       return components.reduce((total, component) => {
         const foodId = component.food === "fruit" ? foodIdForFruit(fruitFor(dayIndex, mealKey === "breakfast")) : component.food;
         const base = foodDatabase[foodId];
         if (!base) return total;
-        const food = { ...base, ...(overrides[foodId] || {}) };
+        const food = { ...base, ...(validFoodOverride(overrides[foodId]) ? overrides[foodId] : {}) };
         const grams = component.grams || (component.servings || 1) * food.servingGrams;
         const factor = grams / 100;
         total.kcal += food.kcal * factor;
@@ -809,7 +858,7 @@
       const slots = ["Colazione", "Spuntino", "Pranzo", "Cena"];
       const fruit = fruitFor(dayIndex, key === "breakfast");
       const ingredients = meal.ingredients.map(([amount, name]) => `<li><b>${amount}</b> ${name.replace("{fruit}", fruit)}</li>`).join("");
-      const done = store.get(completedKey(dayIndex), []).includes(index);
+      const done = storedList(completedKey(dayIndex), validMealIndex).includes(index);
       const trackable = canTrackDay(dayIndex);
       const nutrition = nutritionFor(key, dayIndex);
       return `<article class="meal-card${done ? " done" : ""}">
@@ -836,14 +885,14 @@
       document.querySelector("#today-protein").textContent = `${Math.round(total.protein)} g proteine`;
       document.querySelector("#meal-list").innerHTML = dayMeals(day, selectedDay).map((key, index) => mealCard(key, index, selectedDay)).join("");
       const trackable = canTrackDay(selectedDay);
-      const completed = trackable ? store.get(completedKey(selectedDay), []) : [];
-      const nextIndex = [0, 1, 2, 3].find(index => !completed.includes(index));
+      const completed = trackable ? storedList(completedKey(selectedDay), validMealIndex) : [];
+      const nextIndex = nextMealIndex(completed);
       document.querySelector("#daily-progress-label").textContent = trackable ? (completed.length === 4 ? "Giornata completata" : `${completed.length}/4 pasti completati`) : "Pianificato";
       document.querySelector("#today-next").textContent = trackable
         ? (nextIndex === undefined ? "Tutti i pasti segnati" : `Prossimo: ${["colazione", "spuntino", "pranzo", "cena"][nextIndex]} · ${meals[dayMeals(day, selectedDay)[nextIndex]].time}`)
         : "Spunte disponibili quel giorno";
       document.querySelector("#daily-progress-bar").style.width = `${Math.min(completed.length, 4) * 25}%`;
-      const habits = trackable ? store.get(habitsKey(selectedDay), []) : [];
+      const habits = trackable ? storedList(habitsKey(selectedDay), validHabit) : [];
       document.querySelectorAll("#habit-grid input").forEach(input => {
         input.checked = habits.includes(input.value);
         input.disabled = !trackable;
@@ -884,7 +933,7 @@
     }
 
     function renderShopping() {
-      const checked = store.get("cut-shopping-v2", []);
+      const checked = storedList("cut-shopping-v2", validShoppingId);
       const list = shopping.map(group => ({ ...group, items: group.items.map(item => {
         if (!secondFreeEnabled()) return item;
         if (item.id === "tuna") return { ...item, amount: "4 scatolette", note: "circa 280 g sgocciolato" };
@@ -893,7 +942,7 @@
         return item;
       }) }));
       document.querySelector("#shopping-groups").innerHTML = list.map(group => `<section class="shopping-group" data-group>
-        <h2><span aria-hidden="true">${group.icon}</span>${group.group}<span class="group-count" data-group-count>${group.items.length}/${group.items.length}</span></h2>
+        <h2><span aria-hidden="true">${group.icon}</span>${group.group}<span class="group-count" data-group-count>0/${group.items.length}</span></h2>
         <div class="checklist">${group.items.map(item => `<label class="check-item" data-item>
           <input type="checkbox" value="${item.id}" ${checked.includes(item.id) ? "checked" : ""}>
           <span class="item-copy"><strong>${item.amount}</strong><span>${item.name}${item.note ? `<small>${item.note}</small>` : ""}</span></span>
@@ -906,6 +955,7 @@
       const inputs = [...document.querySelectorAll("#shopping-groups input")];
       const checked = inputs.filter(input => input.checked).map(input => input.value);
       const remainingOnly = document.querySelector("#remaining-only").checked;
+      const query = document.querySelector("#shopping-search").value;
       const remaining = inputs.length - checked.length;
       store.set("cut-shopping-v2", checked);
       document.querySelector("#shopping-count").textContent = `${checked.length}/${inputs.length}`;
@@ -915,18 +965,22 @@
       badge.textContent = remaining || "✓";
       badge.classList.toggle("is-complete", remaining === 0);
       badge.setAttribute("aria-label", remaining ? `${remaining} prodotti da comprare` : "Spesa completata");
-      inputs.forEach(input => input.closest("[data-item]").classList.toggle("filtered", remainingOnly && input.checked));
+      inputs.forEach(input => {
+        const item = input.closest("[data-item]");
+        const matches = matchesShoppingQuery({ amount: item.querySelector(".item-copy strong").textContent, name: item.querySelector(".item-copy span").textContent, note: item.querySelector(".item-copy small")?.textContent }, query);
+        item.classList.toggle("filtered", (remainingOnly && input.checked) || !matches);
+      });
       document.querySelectorAll("[data-group]").forEach(group => {
         const groupInputs = [...group.querySelectorAll("input")];
         const groupRemaining = groupInputs.filter(input => !input.checked).length;
-        group.querySelector("[data-group-count]").textContent = `${groupRemaining}/${groupInputs.length}`;
+        group.querySelector("[data-group-count]").textContent = `${groupInputs.length - groupRemaining}/${groupInputs.length}`;
         group.classList.toggle("complete", groupRemaining === 0);
         group.classList.toggle("empty", !group.querySelector("[data-item]:not(.filtered)"));
       });
     }
 
     function renderLog() {
-      const entries = store.get("cut-measurements", []).sort((a, b) => b.date.localeCompare(a.date));
+      const entries = normalizeMeasurements(store.get("cut-measurements", [])).sort((a, b) => b.date.localeCompare(a.date));
       const rows = entries.length ? entries.map((entry, index) => `<div class="log-row"><span>${new Date(`${entry.date}T12:00:00`).toLocaleDateString("it-IT")}</span><span>${Number(entry.weight).toFixed(1)} kg</span><span>${entry.waist ? `${Number(entry.waist).toFixed(1)} cm` : "—"}</span><button class="delete-log" type="button" data-delete="${index}" aria-label="Elimina misurazione">×</button></div>`).join("") : `<div class="log-row"><span>Nessun dato</span><span>—</span><span>—</span><span></span></div>`;
       document.querySelector("#measurement-log").innerHTML = `<div class="log-row head"><span>Data</span><span>Peso</span><span>Vita</span><span></span></div>${rows}`;
     }
@@ -934,8 +988,9 @@
     const habitNames = { steps: "8.000+ passi", creatine: "Creatina", training: "Pesi", sleep: "Sonno" };
 
     function updateHistory(date, mealIndex, completed) {
-      const history = store.get("cut-history", {});
-      const entry = history[date] || { meals: {}, habits: [] };
+      const history = storedRecord("cut-history");
+      const entry = isRecord(history[date]) ? history[date] : { meals: {}, habits: [] };
+      entry.meals = isRecord(entry.meals) ? entry.meals : {};
       if (mealIndex !== null) {
         if (completed) {
           const dayIndex = (new Date(`${date}T12:00:00`).getDay() + 6) % 7;
@@ -946,7 +1001,7 @@
           delete entry.meals[mealIndex];
         }
       }
-      entry.habits = store.get(`cut-habits-${date}`, []);
+      entry.habits = storedList(`cut-habits-${date}`, validHabit);
       if (!Object.keys(entry.meals).length && !entry.habits.length) delete history[date];
       else history[date] = entry;
       store.set("cut-history", history);
@@ -954,8 +1009,8 @@
     }
 
     function renderHistory() {
-      const history = store.get("cut-history", {});
-      const measurements = new Map(store.get("cut-measurements", []).map(entry => [entry.date, entry]));
+      const history = storedRecord("cut-history");
+      const measurements = new Map(normalizeMeasurements(store.get("cut-measurements", [])).map(entry => [entry.date, entry]));
       const days = [];
       for (let offset = 0; offset < 14; offset++) {
         const date = new Date();
@@ -963,17 +1018,17 @@
         date.setDate(date.getDate() - offset);
         const key = dateKey(date);
         const entry = history[key];
-        const legacyMeals = store.get(`cut-meals-${key}`, []);
-        const legacyHabits = store.get(`cut-habits-${key}`, []);
+        const legacyMeals = storedList(`cut-meals-${key}`, validMealIndex);
+        const legacyHabits = storedList(`cut-habits-${key}`, validHabit);
         if (!entry && !legacyMeals.length && !legacyHabits.length && !measurements.has(key)) continue;
         const dayIndex = (date.getDay() + 6) % 7;
-        const mealRecords = entry?.meals && Object.keys(entry.meals).length
-          ? Object.values(entry.meals)
+        const mealRecords = entry?.meals && isRecord(entry.meals) && Object.keys(entry.meals).length
+          ? Object.values(entry.meals).filter(record => isRecord(record) && meals[record.key]).map(record => ({ name: meals[record.key].name }))
           : legacyMeals.map(index => {
               const mealKey = dayMeals(schedule[dayIndex], dayIndex)[index];
               return { name: meals[mealKey].name };
             });
-        const habits = entry?.habits?.length ? entry.habits : legacyHabits;
+        const habits = Array.isArray(entry?.habits) ? entry.habits.filter(validHabit) : legacyHabits;
         days.push({ key, date, mealRecords, habits, measurement: measurements.get(key) });
       }
 
@@ -1014,17 +1069,23 @@
         if (!canTrackDay(selectedDay)) return;
         const index = Number(doneButton.dataset.mealDone);
         const key = completedKey(selectedDay);
-        const completed = store.get(key, []);
+        const completed = storedList(key, validMealIndex);
         const isCompleted = !completed.includes(index);
         store.set(key, isCompleted ? [...completed, index].sort() : completed.filter(item => item !== index));
         updateHistory(dateKey(weekDate(selectedDay)), index, isCompleted);
         renderSelectedDay();
+        if (isCompleted) {
+          const nextIndex = nextMealIndex(storedList(key, validMealIndex));
+          document.querySelector(`[data-meal-done="${nextIndex}"]`)?.closest(".meal-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       }
     });
 
+    window.addEventListener("hashchange", () => setPanel(location.hash.slice(1), false));
+
     document.querySelector("#habit-grid").addEventListener("change", () => {
       if (!canTrackDay(selectedDay)) return renderSelectedDay();
-      store.set(habitsKey(selectedDay), [...document.querySelectorAll("#habit-grid input:checked")].map(input => input.value));
+      store.set(habitsKey(selectedDay), [...document.querySelectorAll("#habit-grid input:checked")].map(input => input.value).filter(validHabit));
       updateHistory(dateKey(weekDate(selectedDay)), null, false);
     });
     document.querySelector("#second-free-meal").addEventListener("change", event => {
@@ -1035,6 +1096,7 @@
     });
     document.querySelector("#shopping-groups").addEventListener("change", updateShopping);
     document.querySelector("#remaining-only").addEventListener("change", updateShopping);
+    document.querySelector("#shopping-search").addEventListener("input", updateShopping);
     document.querySelector("#reset-shopping").addEventListener("click", () => {
       if (!confirm("Vuoi togliere tutte le spunte?")) return;
       document.querySelectorAll("#shopping-groups input").forEach(input => input.checked = false);
@@ -1089,9 +1151,10 @@
       const form = new FormData(event.currentTarget);
       const measurementDate = form.get("date");
       if (!isValidMeasurementDate(measurementDate)) return alert("Non puoi registrare una misurazione futura.");
-      const entries = store.get("cut-measurements", []);
-      entries.push({ date: measurementDate, weight: form.get("weight"), waist: form.get("waist") });
-      store.set("cut-measurements", entries);
+      const measurement = { date: measurementDate, weight: form.get("weight"), waist: form.get("waist") };
+      if (!isValidMeasurement(measurement)) return alert("Inserisci un peso valido e, se vuoi, un girovita valido.");
+      const entries = normalizeMeasurements(store.get("cut-measurements", []));
+      store.set("cut-measurements", [...entries.filter(entry => entry.date !== measurementDate), measurement]);
       event.currentTarget.reset();
       document.querySelector("#log-date").value = localDate();
       renderLog();
@@ -1101,7 +1164,7 @@
     document.querySelector("#measurement-log").addEventListener("click", event => {
       const button = event.target.closest("[data-delete]");
       if (!button) return;
-      const entries = store.get("cut-measurements", []).sort((a, b) => b.date.localeCompare(a.date));
+      const entries = normalizeMeasurements(store.get("cut-measurements", [])).sort((a, b) => b.date.localeCompare(a.date));
       entries.splice(Number(button.dataset.delete), 1);
       store.set("cut-measurements", entries);
       renderLog();
@@ -1110,7 +1173,8 @@
 
     function fillFoodLabelForm() {
       const foodId = document.querySelector("#food-label-select").value;
-      const food = { ...foodDatabase[foodId], ...(store.get("cut-food-overrides", {})[foodId] || {}) };
+      const overrides = storedRecord("cut-food-overrides");
+      const food = { ...foodDatabase[foodId], ...(validFoodOverride(overrides[foodId]) ? overrides[foodId] : {}) };
       if (!food) return;
       document.querySelector("#food-label-kcal").value = food.kcal;
       document.querySelector("#food-label-protein").value = food.protein;
@@ -1125,7 +1189,7 @@
     document.querySelector("#food-label-form").addEventListener("submit", event => {
       event.preventDefault();
       const foodId = document.querySelector("#food-label-select").value;
-      const overrides = store.get("cut-food-overrides", {});
+      const overrides = storedRecord("cut-food-overrides");
       overrides[foodId] = {
         kcal: Number(document.querySelector("#food-label-kcal").value),
         protein: Number(document.querySelector("#food-label-protein").value)
@@ -1138,7 +1202,7 @@
     });
     document.querySelector("#reset-food-label").addEventListener("click", () => {
       const foodId = document.querySelector("#food-label-select").value;
-      const overrides = store.get("cut-food-overrides", {});
+      const overrides = storedRecord("cut-food-overrides");
       delete overrides[foodId];
       store.set("cut-food-overrides", overrides);
       fillFoodLabelForm();

@@ -1,4 +1,4 @@
-const CACHE = "cut-smart-v4";
+const CACHE = "cut-smart-v6";
 const APP = ["./", "./index.html", "./manifest.webmanifest", "./data/foods.json", "./assets/icon-192.png", "./assets/icon-512.png"];
 
 self.addEventListener("install", event => {
