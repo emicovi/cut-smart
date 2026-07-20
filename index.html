@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#176b43">
+  <meta name="description" content="Menu semplice, spesa pronta e check-in per perdere grasso proteggendo la massa muscolare.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -89,6 +90,8 @@
     }
     .nav-button svg { width: 21px; height: 21px; stroke-width: 2; }
     .nav-button[aria-current="page"] { color: var(--green); background: var(--green-soft); }
+    .nav-badge { min-width: 18px; height: 18px; display: inline-grid; place-items: center; margin-left: -2px; padding: 0 4px; border-radius: 999px; color: #fff; background: #a7431d; font-size: .59rem; font-weight: 950; }
+    .nav-badge.is-complete { color: var(--green-dark); background: #b9ddc5; }
 
     main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
     .panel { padding: 15px 0 34px; }
@@ -132,8 +135,10 @@
     .today-total { text-align: right; }
     .today-total strong { display: block; font-size: 1.05rem; }
     .today-total span { display: block; margin-top: 2px; color: var(--green-dark); font-size: .72rem; font-weight: 850; }
-    .daily-progress { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr; gap: 9px; align-items: center; padding-top: 10px; border-top: 1px solid rgba(23, 107, 67, .16); }
+    .daily-progress { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, auto) minmax(90px, 1fr); gap: 9px; align-items: center; padding-top: 10px; border-top: 1px solid rgba(23, 107, 67, .16); }
+    .daily-progress-copy { min-width: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
     .daily-progress strong { color: var(--green-dark); font-size: .7rem; }
+    .daily-progress-copy span { color: var(--green-dark); font-size: .68rem; }
     .daily-progress-track { height: 7px; overflow: hidden; border-radius: 999px; background: rgba(23, 107, 67, .13); }
     .daily-progress-bar { width: 0; height: 100%; border-radius: inherit; background: var(--green); transition: width .2s ease; }
 
@@ -163,13 +168,14 @@
     .time { padding: 5px 8px; border-radius: 999px; color: var(--green-dark); background: var(--green-soft); font-size: .7rem; font-weight: 900; }
     .done-button { min-height: 32px; padding: 5px 8px; border: 1px solid #b7d6c0; border-radius: 10px; color: var(--green); background: #fff; font-size: .68rem; font-weight: 900; }
     .done-button[aria-pressed="true"] { border-color: var(--green); color: #fff; background: var(--green); }
+    .done-button:disabled { cursor: not-allowed; border-color: var(--line); color: var(--muted); background: #f2f4f2; opacity: .8; }
     .meal-card h2 { margin: 12px 0 9px; font-size: 1.12rem; letter-spacing: -.025em; }
     .ingredients { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
     .ingredients li { padding: 6px 8px; border-radius: 9px; color: #445149; background: #f2f5f2; font-size: .77rem; }
     .ingredients b { color: var(--ink); }
     .taste { margin: 10px 0 0; color: #80502f; font-size: .75rem; line-height: 1.4; }
     .recipe { border-top: 1px solid #edf0ed; background: #fffaf7; }
-    .recipe summary { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 15px; color: var(--orange); cursor: pointer; list-style: none; font-size: .79rem; font-weight: 900; }
+    .recipe summary { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 15px; color: #b8481f; cursor: pointer; list-style: none; font-size: .79rem; font-weight: 900; }
     .recipe summary::-webkit-details-marker { display: none; }
     .recipe summary::after { content: "+"; font-size: 1.15rem; }
     .recipe[open] summary::after { content: "−"; }
@@ -191,6 +197,7 @@
     .habit { min-height: 43px; display: flex; align-items: center; gap: 7px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 11px; color: #405048; background: #f8faf8; font-size: .7rem; font-weight: 800; }
     .habit input { width: 17px; height: 17px; margin: 0; accent-color: var(--green); }
     .habit:has(input:checked) { border-color: #afd1ba; color: var(--green-dark); background: var(--green-soft); }
+    .habit:has(input:disabled) { cursor: not-allowed; color: var(--muted); background: #f2f4f2; opacity: .72; }
 
     .rule-bar { margin-top: 11px; padding: 11px 13px; border-radius: 14px; color: #425047; background: #e9eeea; font-size: .75rem; line-height: 1.45; }
     .rule-bar strong { color: var(--ink); }
@@ -271,7 +278,9 @@
     .shopping-groups { display: grid; gap: 10px; }
     .shopping-group { overflow: hidden; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
     .shopping-group h2 { display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px 13px 9px; font-size: .88rem; }
-    .shopping-group h2 span { font-size: 1.08rem; }
+    .shopping-group h2 > span:first-child { font-size: 1.08rem; }
+    .group-count { margin-left: auto; padding: 4px 7px; border-radius: 999px; color: #5d6961; background: #f1f4f1; font-size: .64rem; font-weight: 900; }
+    .shopping-group.complete .group-count { color: var(--green-dark); background: var(--green-soft); }
     .checklist { display: grid; }
     .check-item { display: grid; grid-template-columns: 23px 1fr; gap: 9px; align-items: center; min-height: 55px; padding: 8px 13px; border-top: 1px solid #edf0ed; }
     .check-item input { width: 19px; height: 19px; margin: 0; accent-color: var(--green); }
@@ -376,7 +385,7 @@
         </button>
         <button class="nav-button" type="button" data-panel="spesa" aria-current="false">
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 8h18l-2 12H5L3 8Z"/><path d="m8 8 4-6 4 6M8 12v4M12 12v4M16 12v4"/></svg>
-          <span>Spesa</span>
+          <span>Spesa</span><span class="nav-badge" id="shopping-badge" aria-label="22 prodotti da comprare">22</span>
         </button>
         <button class="nav-button" type="button" data-panel="check" aria-current="false">
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
@@ -396,7 +405,7 @@
         <header class="today-summary" aria-live="polite">
           <div><small id="today-context">Oggi mangi</small><h1 id="today-title">Lunedì</h1></div>
           <div class="today-total"><strong id="today-kcal">1.685 kcal</strong><span id="today-protein">147 g proteine</span></div>
-          <div class="daily-progress"><strong id="daily-progress-label">0/4 pasti completati</strong><div class="daily-progress-track" aria-hidden="true"><div class="daily-progress-bar" id="daily-progress-bar"></div></div></div>
+          <div class="daily-progress"><div class="daily-progress-copy"><strong id="daily-progress-label">0/4 pasti completati</strong><span id="today-next">Prossimo: colazione · 2 min</span></div><div class="daily-progress-track" aria-hidden="true"><div class="daily-progress-bar" id="daily-progress-bar"></div></div></div>
         </header>
 
         <div class="meal-list" id="meal-list"></div>
@@ -404,7 +413,7 @@
 
         <section class="habit-card">
           <h2>Oltre al menu</h2>
-          <p>Le quattro cose che aiutano a perdere grasso senza sacrificare muscolo.</p>
+          <p id="habit-help">Le quattro cose che aiutano a perdere grasso senza sacrificare muscolo.</p>
           <div class="habit-grid" id="habit-grid">
             <label class="habit"><input type="checkbox" value="steps"> 8.000+ passi</label>
             <label class="habit"><input type="checkbox" value="creatine"> Creatina 3–5 g</label>
@@ -717,9 +726,33 @@
     };
     const dateKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     const localDate = () => dateKey(new Date());
+    const isCalendarDate = value => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+      const date = new Date(`${value}T12:00:00`);
+      return !Number.isNaN(date.getTime()) && dateKey(date) === value;
+    };
+    const isFutureDate = date => dateKey(date) > localDate();
+    const canTrackDay = dayIndex => !isFutureDate(weekDate(dayIndex));
+    const isValidMeasurementDate = value => isCalendarDate(value) && value <= localDate();
     const completedKey = dayIndex => `cut-meals-${dateKey(weekDate(dayIndex))}`;
     const habitsKey = dayIndex => `cut-habits-${dateKey(weekDate(dayIndex))}`;
     const secondFreeEnabled = () => store.get("cut-second-free-meal", false);
+
+    function sanitizeTrackingData() {
+      const today = localDate();
+      const datedKeys = Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index)).filter(Boolean);
+      for (const key of datedKeys) {
+        const date = key.match(/^cut-(?:meals|habits)-(\d{4}-\d{2}-\d{2})$/)?.[1];
+        if (date && (!isCalendarDate(date) || date > today)) localStorage.removeItem(key);
+      }
+      const history = store.get("cut-history", {});
+      const cleanHistory = Object.fromEntries(Object.entries(history).filter(([date]) => isCalendarDate(date) && date <= today));
+      if (Object.keys(cleanHistory).length !== Object.keys(history).length) store.set("cut-history", cleanHistory);
+      const measurements = store.get("cut-measurements", []);
+      const cleanMeasurements = measurements.filter(entry => isValidMeasurementDate(entry.date));
+      if (cleanMeasurements.length !== measurements.length) store.set("cut-measurements", cleanMeasurements);
+    }
+
     const dayMeals = (day, dayIndex) => ["breakfast", day.snack, day.lunch, secondFreeEnabled() && dayIndex === 4 ? "free2" : day.dinner];
     const fruitFor = (dayIndex, breakfast) => {
       const first = dayIndex % 2 === 0 ? "banana" : "mela";
@@ -777,12 +810,13 @@
       const fruit = fruitFor(dayIndex, key === "breakfast");
       const ingredients = meal.ingredients.map(([amount, name]) => `<li><b>${amount}</b> ${name.replace("{fruit}", fruit)}</li>`).join("");
       const done = store.get(completedKey(dayIndex), []).includes(index);
+      const trackable = canTrackDay(dayIndex);
       const nutrition = nutritionFor(key, dayIndex);
       return `<article class="meal-card${done ? " done" : ""}">
         <div class="meal-main">
           <div class="meal-top">
             <div class="meal-slot"><span class="meal-emoji" aria-hidden="true">${done ? "✓" : meal.emoji}</span><div><span>${slots[index]}</span><strong>${Math.round(nutrition.kcal)} kcal · ${Math.round(nutrition.protein)} g proteine</strong></div></div>
-            <div class="meal-actions"><span class="time">${meal.time}</span><button class="done-button" type="button" data-meal-done="${index}" aria-pressed="${done}">${done ? "Fatto" : "Mangiato"}</button></div>
+            <div class="meal-actions"><span class="time">${meal.time}</span><button class="done-button" type="button" data-meal-done="${index}" aria-pressed="${done}" ${trackable ? "" : "disabled title=\"Disponibile dal giorno del pasto\""}>${done ? "Fatto" : trackable ? "Mangiato" : "In programma"}</button></div>
           </div>
           <h2>${meal.name}</h2>
           <ul class="ingredients">${ingredients}</ul>
@@ -801,11 +835,20 @@
       document.querySelector("#today-kcal").textContent = `${Math.round(total.kcal).toLocaleString("it-IT")} kcal`;
       document.querySelector("#today-protein").textContent = `${Math.round(total.protein)} g proteine`;
       document.querySelector("#meal-list").innerHTML = dayMeals(day, selectedDay).map((key, index) => mealCard(key, index, selectedDay)).join("");
-      const completed = store.get(completedKey(selectedDay), []);
-      document.querySelector("#daily-progress-label").textContent = completed.length === 4 ? "Giornata completata" : `${completed.length}/4 pasti completati`;
-      document.querySelector("#daily-progress-bar").style.width = `${completed.length * 25}%`;
-      const habits = store.get(habitsKey(selectedDay), []);
-      document.querySelectorAll("#habit-grid input").forEach(input => input.checked = habits.includes(input.value));
+      const trackable = canTrackDay(selectedDay);
+      const completed = trackable ? store.get(completedKey(selectedDay), []) : [];
+      const nextIndex = [0, 1, 2, 3].find(index => !completed.includes(index));
+      document.querySelector("#daily-progress-label").textContent = trackable ? (completed.length === 4 ? "Giornata completata" : `${completed.length}/4 pasti completati`) : "Pianificato";
+      document.querySelector("#today-next").textContent = trackable
+        ? (nextIndex === undefined ? "Tutti i pasti segnati" : `Prossimo: ${["colazione", "spuntino", "pranzo", "cena"][nextIndex]} · ${meals[dayMeals(day, selectedDay)[nextIndex]].time}`)
+        : "Spunte disponibili quel giorno";
+      document.querySelector("#daily-progress-bar").style.width = `${Math.min(completed.length, 4) * 25}%`;
+      const habits = trackable ? store.get(habitsKey(selectedDay), []) : [];
+      document.querySelectorAll("#habit-grid input").forEach(input => {
+        input.checked = habits.includes(input.value);
+        input.disabled = !trackable;
+      });
+      document.querySelector("#habit-help").textContent = trackable ? "Le quattro cose che aiutano a perdere grasso senza sacrificare muscolo." : "Le abitudini si possono segnare solo quando arriva questo giorno.";
       document.querySelectorAll(".day-button").forEach(button => button.setAttribute("aria-pressed", Number(button.dataset.day) === selectedDay));
 
       const prep = {
@@ -850,7 +893,7 @@
         return item;
       }) }));
       document.querySelector("#shopping-groups").innerHTML = list.map(group => `<section class="shopping-group" data-group>
-        <h2><span aria-hidden="true">${group.icon}</span>${group.group}</h2>
+        <h2><span aria-hidden="true">${group.icon}</span>${group.group}<span class="group-count" data-group-count>${group.items.length}/${group.items.length}</span></h2>
         <div class="checklist">${group.items.map(item => `<label class="check-item" data-item>
           <input type="checkbox" value="${item.id}" ${checked.includes(item.id) ? "checked" : ""}>
           <span class="item-copy"><strong>${item.amount}</strong><span>${item.name}${item.note ? `<small>${item.note}</small>` : ""}</span></span>
@@ -863,12 +906,23 @@
       const inputs = [...document.querySelectorAll("#shopping-groups input")];
       const checked = inputs.filter(input => input.checked).map(input => input.value);
       const remainingOnly = document.querySelector("#remaining-only").checked;
+      const remaining = inputs.length - checked.length;
       store.set("cut-shopping-v2", checked);
       document.querySelector("#shopping-count").textContent = `${checked.length}/${inputs.length}`;
       document.querySelector("#shopping-progress").style.width = `${inputs.length ? checked.length / inputs.length * 100 : 0}%`;
-      document.querySelector("#shopping-message").textContent = checked.length === inputs.length ? "Hai tutto per la settimana." : checked.length ? `Mancano ${inputs.length - checked.length} prodotti.` : "Inizia dalle proteine.";
+      document.querySelector("#shopping-message").textContent = checked.length === inputs.length ? "Hai tutto per la settimana." : checked.length ? `Mancano ${remaining} prodotti.` : "Inizia dalle proteine.";
+      const badge = document.querySelector("#shopping-badge");
+      badge.textContent = remaining || "✓";
+      badge.classList.toggle("is-complete", remaining === 0);
+      badge.setAttribute("aria-label", remaining ? `${remaining} prodotti da comprare` : "Spesa completata");
       inputs.forEach(input => input.closest("[data-item]").classList.toggle("filtered", remainingOnly && input.checked));
-      document.querySelectorAll("[data-group]").forEach(group => group.classList.toggle("empty", !group.querySelector("[data-item]:not(.filtered)")));
+      document.querySelectorAll("[data-group]").forEach(group => {
+        const groupInputs = [...group.querySelectorAll("input")];
+        const groupRemaining = groupInputs.filter(input => !input.checked).length;
+        group.querySelector("[data-group-count]").textContent = `${groupRemaining}/${groupInputs.length}`;
+        group.classList.toggle("complete", groupRemaining === 0);
+        group.classList.toggle("empty", !group.querySelector("[data-item]:not(.filtered)"));
+      });
     }
 
     function renderLog() {
@@ -957,6 +1011,7 @@
 
       const doneButton = event.target.closest("[data-meal-done]");
       if (doneButton) {
+        if (!canTrackDay(selectedDay)) return;
         const index = Number(doneButton.dataset.mealDone);
         const key = completedKey(selectedDay);
         const completed = store.get(key, []);
@@ -968,6 +1023,7 @@
     });
 
     document.querySelector("#habit-grid").addEventListener("change", () => {
+      if (!canTrackDay(selectedDay)) return renderSelectedDay();
       store.set(habitsKey(selectedDay), [...document.querySelectorAll("#habit-grid input:checked")].map(input => input.value));
       updateHistory(dateKey(weekDate(selectedDay)), null, false);
     });
@@ -1031,8 +1087,10 @@
     document.querySelector("#log-form").addEventListener("submit", event => {
       event.preventDefault();
       const form = new FormData(event.currentTarget);
+      const measurementDate = form.get("date");
+      if (!isValidMeasurementDate(measurementDate)) return alert("Non puoi registrare una misurazione futura.");
       const entries = store.get("cut-measurements", []);
-      entries.push({ date: form.get("date"), weight: form.get("weight"), waist: form.get("waist") });
+      entries.push({ date: measurementDate, weight: form.get("weight"), waist: form.get("waist") });
       store.set("cut-measurements", entries);
       event.currentTarget.reset();
       document.querySelector("#log-date").value = localDate();
@@ -1150,22 +1208,26 @@
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 
     async function init() {
-      try {
-        const response = await fetch("data/foods.json");
-        if (!response.ok) throw new Error(`Food database: ${response.status}`);
-        foodDatabase = (await response.json()).foods;
-      } catch (error) {
-        console.warn("Uso i valori nutrizionali integrati", error);
-      }
+      sanitizeTrackingData();
       renderDayPicker();
       renderSelectedDay();
       renderWeek();
       renderShopping();
       renderLog();
       renderHistory();
-      fillFoodLabelForm();
       document.querySelector("#log-date").value = localDate();
+      document.querySelector("#log-date").max = localDate();
       setPanel(location.hash.slice(1) || "oggi", false);
+
+      try {
+        const response = await fetch("data/foods.json");
+        if (!response.ok) throw new Error(`Food database: ${response.status}`);
+        foodDatabase = (await response.json()).foods;
+        refreshNutrition();
+      } catch (error) {
+        console.warn("Uso i valori nutrizionali integrati", error);
+      }
+      fillFoodLabelForm();
       selfCheck();
     }
 
