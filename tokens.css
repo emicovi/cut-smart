@@ -1,0 +1,68 @@
+:root {
+  color-scheme: light;
+
+  --color-paper: oklch(97% 0.012 150);
+  --color-paper-2: oklch(94% 0.014 150);
+  --color-paper-3: oklch(91% 0.016 150);
+  --color-ink: oklch(20% 0.018 150);
+  --color-ink-2: oklch(36% 0.014 150);
+  --color-muted: oklch(45% 0.012 150);
+  --color-neutral: oklch(55% 0.012 150);
+  --color-rule: oklch(82% 0.014 150);
+  --color-rule-2: oklch(89% 0.012 150);
+  --color-accent: oklch(45% 0.14 150);
+  --color-accent-strong: oklch(36% 0.12 150);
+  --color-accent-soft: oklch(91% 0.045 150);
+  --color-accent-ink: oklch(98% 0.008 150);
+  --color-focus: oklch(62% 0.19 150);
+  --color-error: oklch(50% 0.17 25);
+  --color-error-soft: oklch(93% 0.035 25);
+  --color-warning: oklch(48% 0.105 75);
+  --color-warning-soft: oklch(94% 0.045 85);
+
+  --font-display: "Bricolage Grotesque", "Arial Narrow", sans-serif;
+  --font-body: "Geist", "Segoe UI", sans-serif;
+
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --space-4xl: 9rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.25rem;
+  --text-lg: 1.5625rem;
+  --text-xl: 1.9531rem;
+  --text-2xl: 2.4414rem;
+  --text-display: clamp(2.1rem, 7vw, 4.25rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+
+  --rule-hair: 1px;
+  --radius-control: 0.625rem;
+  --radius-card: 0.875rem;
+  --radius-pill: 999px;
+  --shadow-float: 0 0.75rem 2rem -1.25rem oklch(20% 0.018 150 / 0.34);
+  --banner-height: 4rem;
+
+  --z-base: 1;
+  --z-raised: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-sticky-nav: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+}

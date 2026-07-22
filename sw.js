@@ -1,5 +1,5 @@
-const CACHE = "cut-smart-v6";
-const APP = ["./", "./index.html", "./manifest.webmanifest", "./data/foods.json", "./assets/icon-192.png", "./assets/icon-512.png"];
+const CACHE = "cut-smart-v16";
+const APP = ["./", "./index.html", "./tokens.css", "./app.css", "./manifest.webmanifest", "./data/foods.json", "./assets/icon-192.png", "./assets/icon-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP)).then(() => self.skipWaiting()));

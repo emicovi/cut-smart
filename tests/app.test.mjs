@@ -6,12 +6,18 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const appCss = fs.readFileSync(path.join(root, "app.css"), "utf8");
+const tokensCss = fs.readFileSync(path.join(root, "tokens.css"), "utf8");
+const design = fs.readFileSync(path.join(root, "design.md"), "utf8");
+const preflight = JSON.parse(fs.readFileSync(path.join(root, ".hallmark/preflight.json"), "utf8"));
+const hallmarkLog = JSON.parse(fs.readFileSync(path.join(root, ".hallmark/log.json"), "utf8"));
+const serviceWorker = fs.readFileSync(path.join(root, "sw.js"), "utf8");
 const foods = JSON.parse(fs.readFileSync(path.join(root, "data/foods.json"), "utf8")).foods;
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.webmanifest"), "utf8"));
 const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(script, "Inline app script missing");
 new vm.Script(script, { filename: "index.html:inline" });
-new vm.Script(fs.readFileSync(path.join(root, "sw.js"), "utf8"), { filename: "sw.js" });
+new vm.Script(serviceWorker, { filename: "sw.js" });
 
 class FixedDate extends Date {
   constructor(...args) { super(...(args.length ? args : ["2026-07-20T12:00:00"])); }
@@ -31,10 +37,10 @@ const coreEnd = script.indexOf('document.addEventListener("click"');
 assert.ok(coreEnd > 0, "Core boundary missing");
 const core = `${script.slice(0, coreEnd)}
 foodDatabase = globalThis.__foods;
-globalThis.__cut = { meals, mealComponents, schedule, shopping, nutritionFor, totals, dayMeals, mealCard, todayIndex, weekDate, dateKey, localDate, isCalendarDate, isFutureDate, canTrackDay, isValidMeasurementDate, isValidMeasurement, normalizeMeasurements, sanitizeTrackingData, nextMealIndex, proteinTarget, energyEstimate, recommendationFor, matchesShoppingQuery, isRecord, storedList, storedRecord, validMealIndex, validHabit, validShoppingId, validFoodOverride, labelFoodIds };`;
+globalThis.__cut = { meals, mealComponents, schedule, shopping, nutritionFor, totals, dayMeals, mealCard, todayIndex, weekDate, dateKey, localDate, isCalendarDate, isFutureDate, canTrackDay, isValidMeasurementDate, isValidMeasurement, normalizeMeasurements, sanitizeTrackingData, nextMealIndex, proteinTarget, energyEstimate, recommendationFor, matchesShoppingQuery, recipeSteps, shoppingGroupId, measurementTrend, isRecord, storedList, storedRecord, validMealIndex, validHabit, validShoppingId, validFoodOverride, labelFoodIds };`;
 const context = vm.createContext({ console, Date: FixedDate, JSON, Math, Object, Array, Set, Map, localStorage, __foods: foods });
 vm.runInContext(core, context, { filename: "index.html:inline" });
-const { meals, mealComponents, schedule, shopping, nutritionFor, totals, dayMeals, mealCard, todayIndex, weekDate, dateKey, localDate, isCalendarDate, isFutureDate, canTrackDay, isValidMeasurementDate, isValidMeasurement, normalizeMeasurements, sanitizeTrackingData, nextMealIndex, proteinTarget, energyEstimate, recommendationFor, matchesShoppingQuery, isRecord, storedList, storedRecord, validMealIndex, validHabit, validShoppingId, validFoodOverride, labelFoodIds } = context.__cut;
+const { meals, mealComponents, schedule, shopping, nutritionFor, totals, dayMeals, mealCard, todayIndex, weekDate, dateKey, localDate, isCalendarDate, isFutureDate, canTrackDay, isValidMeasurementDate, isValidMeasurement, normalizeMeasurements, sanitizeTrackingData, nextMealIndex, proteinTarget, energyEstimate, recommendationFor, matchesShoppingQuery, recipeSteps, shoppingGroupId, measurementTrend, isRecord, storedList, storedRecord, validMealIndex, validHabit, validShoppingId, validFoodOverride, labelFoodIds } = context.__cut;
 
 assert.equal(schedule.length, 7, "The plan must cover seven days");
 assert.equal(new Set(shopping.flatMap(group => group.items.map(item => item.id))).size, 22, "Shopping IDs must be unique");
@@ -42,6 +48,25 @@ assert.ok(Object.values(meals).every(meal => meal.method && meal.swap), "Every m
 assert.ok(Object.keys(mealComponents).every(key => meals[key]), "Every calculated meal must exist");
 assert.equal(manifest.display, "standalone");
 for (const icon of manifest.icons) assert.ok(fs.existsSync(path.join(root, icon.src)), `Missing ${icon.src}`);
+assert.match(html, /href="tokens\.css"/, "The app must load the locked Hallmark tokens");
+assert.match(html, /href="app\.css"/, "The app must load the Hallmark interface stylesheet");
+assert.doesNotMatch(html, /<style>/, "Legacy inline styles should not bypass the locked design system");
+assert.doesNotMatch(html, /style="/, "Markup should not improvise inline styles");
+assert.ok(appCss.startsWith("/* Hallmark · genre: modern-minimal"), "The page stylesheet needs the durable Hallmark stamp");
+assert.match(appCss, /pre-emit critique: P\d H\d E\d S\d R\d V\d/, "The Hallmark self-critique must be recorded");
+assert.match(appCss, /html,\s*\nbody\s*\{\s*\n\s*overflow-x: clip;/, "Responsive output must clip horizontal overflow without creating a scroll container");
+assert.doesNotMatch(appCss, /transition:\s*all\b/, "Hallmark output must not use transition-all");
+assert.doesNotMatch(appCss, /100vw/, "Hallmark output must not use viewport widths that include scrollbars");
+assert.match(tokensCss, /--color-paper:\s*oklch\(/, "The design tokens must use OKLCH colours");
+assert.match(tokensCss, /--font-display:\s*"Bricolage Grotesque"/, "The display font must stay locked");
+assert.match(tokensCss, /--font-body:\s*"Geist"/, "The body font must stay locked");
+assert.match(design, /## Macrostructure family[\s\S]*Narrative Workflow/, "The app design system must lock its workflow structure");
+assert.equal(preflight.framework, "vanilla-html");
+assert.equal(hallmarkLog[0].scope, "app");
+assert.equal(hallmarkLog[0].macrostructure, "Narrative Workflow");
+assert.match(serviceWorker, /cut-smart-v16/, "The service worker cache must be bumped for the redesign");
+assert.match(serviceWorker, /\.\/tokens\.css/);
+assert.match(serviceWorker, /\.\/app\.css/);
 
 assert.equal(localDate(), "2026-07-20");
 assert.equal(todayIndex(), 0, "Fixed test date must be Monday");
@@ -71,25 +96,46 @@ assert.equal(JSON.stringify(normalizeMeasurements([
 ])), JSON.stringify([{ date: "2026-07-20", weight: "69.6", waist: "85" }]), "Measurements must be valid, unique by date and limited to today");
 assert.match(mealCard("breakfast", 0, 0), />Mangiato<\/button>/);
 assert.match(mealCard("breakfast", 0, 1), /disabled[^>]*>In programma<\/button>/, "Future meal button must be disabled");
+assert.match(mealCard("breakfast", 0, 0), /data-cook="breakfast"/, "Every recipe card should launch guided cooking");
+assert.ok(recipeSteps(meals.breakfast.method).length >= 2, "Recipe methods should become multiple guided steps");
 assert.match(html, /meta name="description"/, "The app needs a concise page description");
 assert.match(html, /id="today-next"/, "Today view should surface the next meal");
+assert.match(html, /<details class="habit-card">/, "Supporting habits should stay secondary to the meal workflow");
+assert.equal((html.match(/data-nav-section=/g) || []).length, 3, "Primary navigation should stay focused on three sections");
+assert.match(html, /data-plan-view="oggi"[\s\S]*data-plan-view="settimana"/, "Today and week should be views of one plan");
 assert.match(html, /id="week-average-kcal">—<\/strong>/, "Nutrition summaries must start neutral before food data loads");
 assert.match(html, /foodDatabase = \(await response\.json\(\)\)\.foods;[\s\S]*refreshNutrition\(\);/, "Nutrition must render after the food database resolves");
 assert.match(html, /id="shopping-badge"/, "Shopping progress should be visible in navigation");
 assert.match(html, /id="shopping-search"/, "Shopping list should be searchable");
+assert.match(html, /data-shopping-filter="remaining"/, "Shopping should offer one-tap status filters");
+assert.match(html, /data-shopping-filter="remaining" aria-pressed="true"/, "Shopping should open on items still to buy");
+assert.doesNotMatch(html, /data-shopping-filter="all"/, "Shopping should not duplicate the pending-items view with an all-items filter");
+assert.match(html, /id="shopping-empty"/, "Shopping search and filters need an empty state");
+assert.match(html, /id="undo-shopping"/, "Shopping should allow accidental checks to be undone");
+assert.doesNotMatch(html, /Il tocco buono/, "Shopping should not end with decorative advice");
+assert.match(html, /groupIndex \? " collapsed" : ""/, "Shopping should reveal one department at a time");
+assert.match(html, /id="cook-mode"/, "Guided cooking dialog must be available");
+assert.match(html, /id="weight-chart"/, "Check-in should visualize the measurement trend");
 assert.match(html, /data-group-count>0\/\$\{group\.items\.length\}/, "Category counters should start at zero items taken");
 assert.match(html, /addEventListener\("hashchange"/, "Deep links should keep the visible panel in sync");
 assert.deepEqual([nextMealIndex([]), nextMealIndex([0]), nextMealIndex([0, 2]), nextMealIndex([0, 1, 2, 3])], [0, 1, 1, undefined]);
 assert.equal(JSON.stringify(proteinTarget(70)), JSON.stringify({ low: 112, high: 140 }));
 assert.equal(proteinTarget("invalid"), null, "Invalid weights must not create a protein target");
 assert.equal(JSON.stringify(energyEstimate({ sex: "male", age: 31, heightCm: 164, weightKg: 70 })), JSON.stringify({ bmr: 1575, maintenanceLow: 2126, maintenanceHigh: 2284, targetKcal: 1850 }));
-assert.match(html, /Piano personalizzato per definizione/, "The plan must identify its phase");
+assert.match(html, /I tuoi 7 giorni/, "The weekly plan should use a simple, direct title");
 assert.equal(recommendationFor(70, 69.6, "stable", false).title, "Continua uguale");
 assert.equal(recommendationFor(70, 69.8, "stable", true).title, "Riduci una sola uscita");
 assert.equal(recommendationFor(70, 69, "stable", false).tone, "alert");
 assert.equal(recommendationFor(70, 69.6, "down", false).title, "Proteggi la forza");
 assert.equal(matchesShoppingQuery({ amount: "1 kg", name: "Pollo o tacchino" }, "pollo"), true);
 assert.equal(matchesShoppingQuery({ amount: "1 kg", name: "Pollo o tacchino" }, "riso"), false);
+assert.equal(shoppingGroupId("Frutta e verdura"), "shopping-frutta-e-verdura");
+const trend = measurementTrend([
+  { date: "2026-07-20", weight: "70" },
+  { date: "2026-07-18", weight: "70.5", waist: "86" }
+]);
+assert.equal(trend.latest.date, "2026-07-20");
+assert.equal(trend.deltaWeight, -0.5);
 assert.equal(isRecord({}), true);
 assert.equal(isRecord([]), false);
 assert.equal(validMealIndex(3), true);

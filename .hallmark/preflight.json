@@ -1,0 +1,24 @@
+{
+  "scannedAt": "2026-07-22",
+  "framework": "vanilla-html",
+  "entry": "index.html",
+  "fontStack": "Inter with system fallbacks",
+  "palette": "hex custom properties in the inline :root block",
+  "motion": "motion-cut; no animation library",
+  "spacing": "mixed rem and pixel values without a named scale",
+  "pwa": true,
+  "preserve": [
+    "Piano, Spesa, Progressi information architecture",
+    "meal and nutrition data",
+    "guided cooking",
+    "localStorage state",
+    "service worker and manifest"
+  ],
+  "introduce": [
+    "locked OKLCH tokens",
+    "Bricolage Grotesque and Geist pairing",
+    "Narrative Workflow app structure",
+    "N5-inspired navigation",
+    "Hallmark interaction and responsive gates"
+  ]
+}
